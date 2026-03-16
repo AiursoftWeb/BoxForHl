@@ -26,11 +26,9 @@ Run `./deploy.sh` to start the deployment process. Ensure your `.env` file is pr
 
 ## TODO
 
-auth.chopinsight.cn
 clickhouse.chopinsight.cn
 grafana.chopinsight.cn
 hub.chopinsight.cn
-test.chopinsight.cn
 vikunja.chopinsight.cn
 gitlab.chopinsight.cn
 employee.chopinsight.cn
@@ -45,3 +43,8 @@ uptime.chopinsight.cn
 minio.chopinsight.cn
 litellm.chopinsight.cn
 tracer.chopinsight.cn
+
+## Done
+
+auth.chopinsight.cn
+test.chopinsight.cn
