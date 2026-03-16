@@ -39,8 +39,6 @@ uptime.chopinsight.cn
 minio.chopinsight.cn
 litellm.chopinsight.cn
 
-tracer.chopinsight.cn
-vikunja.chopinsight.cn
 
 ## Done
 
@@ -49,3 +47,5 @@ test.chopinsight.cn
 clickhouse.chopinsight.cn
 grafana.chopinsight.cn
 hub.chopinsight.cn
+vikunja.chopinsight.cn
+tracer.chopinsight.cn
