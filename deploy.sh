@@ -582,6 +582,9 @@ sudo docker push localhost:8080/box_starting/local_sites:latest
 print_ok "Building local pysyncer..."
 sudo docker build ./stage2/images/pysyncer    -t localhost:8080/box_starting/local_pysyncer:latest
 sudo docker push localhost:8080/box_starting/local_pysyncer:latest
+print_ok "Building local frp..."
+sudo docker build ./stage2/images/frp         -t localhost:8080/box_starting/local_frp:latest
+sudo docker push localhost:8080/box_starting/local_frp:latest
 
 print_ok "Cleaning old docker-compose.yml..."
 rm -f ./stage2/stacks/incoming/docker-compose.yml
@@ -595,8 +598,8 @@ deploy stage2/stacks/incoming/docker-compose.yml incoming # 8080
 
 print_ok "Make sure the caddy is ready..."
 sleep 5 # Could not trust result in the first few seconds, because the old registry might still be running
-while [ "$(curl -s -o /dev/null -w "%{http_code}" https://test.aiursoft.cn)" != "200" ]; do
-    print_warn "Waiting for caddy (https://test.aiursoft.cn) to start... ETA: 25s"
+while [ "$(curl -s -o /dev/null -w "%{http_code}" https://test.chopinsight.cn)" != "200" ]; do
+    print_warn "Waiting for caddy (https://test.chopinsight.cn) to start... ETA: 25s"
     sleep 1
 done
 
@@ -614,14 +617,19 @@ sleep 3
 print_ok "Building local zot..."
 sudo docker build ./stage3/images/zot -t localhost:8080/box_starting/local_zot:latest
 sudo docker push localhost:8080/box_starting/local_zot:latest
+print_ok "Building local puller..."
+sudo docker build ./stage3/images/puller -t localhost:8080/box_starting/local_puller:latest
+sudo docker push localhost:8080/box_starting/local_puller:latest
 
-print_ok "Starting Zot, Puller, ppamirror..."
+print_ok "Starting Zot, Puller, Authentik..."
 deploy stage3/stacks/zot/docker-compose.yml zot
+deploy stage3/stacks/puller/docker-compose.yml puller
+deploy stage3/stacks/authentik/docker-compose.yml authentik
 
 print_ok "Making sure the zot is ready..."
 sleep 5
-while [ "$(curl -s -o /dev/null -w "%{http_code}" https://hub.aiursoft.cn)" != "200" ]; do
-    print_warn "Waiting for registry (https://hub.aiursoft.cn) to start... ETA: 25s"
+while [ "$(curl -s -o /dev/null -w "%{http_code}" https://hub.chopinsight.cn)" != "200" ]; do
+    print_warn "Waiting for registry (https://hub.chopinsight.cn) to start... ETA: 25s"
     sleep 1
 done
 

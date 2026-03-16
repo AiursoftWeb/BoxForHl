@@ -11,9 +11,9 @@ RUN apt-get update \
 
 RUN mkdir -p /etc/zot /config /data
 
-# Check if git.aiursoft.com is accessible. If so, download from the mirror.
+# Check if git.chopinsight.cn is accessible. If so, download from the mirror.
 # Otherwise, download from the official GitHub releases.
-RUN M_URL="https://git.aiursoft.com/PublicVault/zot/releases/download/${ZOT_VERSION}/zot-linux-amd64" && \
+RUN M_URL="https://git.chopinsight.cn/PublicVault/zot/releases/download/${ZOT_VERSION}/zot-linux-amd64" && \
     G_URL="https://github.com/project-zot/zot/releases/download/${ZOT_VERSION}/zot-linux-amd64" && \
     \
     echo "--> Measuring latency..." && \

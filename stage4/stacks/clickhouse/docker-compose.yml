@@ -2,9 +2,9 @@ version: '3.9'
 
 services:
   authentik_proxy:
-    image: hub.aiursoft.cn/ghcr.io/goauthentik/proxy:2025.12.3
+    image: hub.chopinsight.cn/ghcr.io/goauthentik/proxy:2025.12.3
     environment:
-      AUTHENTIK_HOST: "https://auth.aiursoft.com/"
+      AUTHENTIK_HOST: "https://auth.chopinsight.cn/"
       AUTHENTIK_INSECURE: "false"
       AUTHENTIK_TOKEN: "{{CLICKHOUSE_OUTPOST_TOKEN}}"
     stop_grace_period: 20s
@@ -22,7 +22,7 @@ services:
         delay: 5s
 
   clickhouse:
-    image: hub.aiursoft.cn/clickhouse/clickhouse-server:latest
+    image: hub.chopinsight.cn/clickhouse/clickhouse-server:latest
     environment:
       - CLICKHOUSE_USER=default
       - CLICKHOUSE_PASSWORD=123456

@@ -1,63 +1,25 @@
-# BoxForChina 🇨🇳
+# BoxForChopart ⚙️
 
-**Role:** Domestic Acceleration & Traffic Entry
+**Role:** Chopart Node Management & Service Hosting
 
-This repository contains the configuration and deployment logic for the **China Region** nodes of the Aiursoft Hybrid Cloud.
+This repository contains the configuration and deployment logic for the **Chopart Server** of the Aiursoft Hybrid Cloud.
 
 ## 🎯 Strategic Objective
-To provide low-latency access to services for users within Mainland China, bypassing network congestion and ensuring stable connectivity to the core infrastructure.
+To provide a self-contained, high-performance environment for hosting services on the Chopart server, with full integration for FRP, Authentik, and Vikunja.
 
 ## 🏗 Architecture Specifics
-*   **Ingress:** Optimized for domestic ISPs (China Telecom/Unicom/Mobile).
-*   **Routing:** Uses local DNS strategies to route requests:
-    *   **Static Assets:** Redirected to local caches or CDNs.
-    *   **Dynamic Traffic:** Tunneled to `BoxForProart` via encrypted links.
-*   **Restrictions:** Does *not* host heavy storage or heavy compute to minimize VPS costs and legal risks.
+*   **Infrastructure:** Built on top of the Aiursoft Box project architecture.
+*   **Network:** Uses FRP for tunneling and Caddy for domain management.
+*   **Authentication:** Fully integrated with Authentik for centralized identity management.
+*   **Services:** Currently hosts Vikunja as the primary task management platform.
+*   **Domains:** All services are hosted under the `chopinsight.cn` domain.
 
 ## 📦 Stacks Included
-*   **Stage 2 (Network):** 
-    *   `baseline`: Basic network connectivity checks.
-    *   `build_proxy`: Accelerates build processes for local runners.
-    *   `incoming`: The main Caddy reverse proxy entry point.
-*   **Stage 4 (Apps):**
-    *   Proxies for `ClickHouse`, `Grafana`, `Tracer` (pointing to Core).
-    *   Lightweight edge services.
+*   **Stage 0:** Local Registry for bootstrapping.
+*   **Stage 1:** Image Mirroring for essential services.
+*   **Stage 2:** Network infrastructure (Caddy, FRP, PySyncer).
+*   **Stage 3:** Advanced registries and Identity management (Zot, Puller, Authentik).
+*   **Stage 4:** Business applications (Vikunja).
 
 ## 🚀 Deployment
-
-```bash
-# On a fresh Tencent Cloud / Aliyun / Ningbo Node:
-git clone https://gitlab.aiursoft.cn/aiursoft/bash-app.git
-cd bash-app/Boxes/BoxForChina
-sudo bash deploy.sh
-```
-
-## Speed up docker
-
-First, install Xray or other proxy tools that support HTTP proxy on your AnduinOS host.
-
-Then, create or modify the docker systemd service override file to set the HTTP and HTTPS proxy environment variables.
-
-```bash
-sudo cat > /etc/systemd/system/docker.service.d/http-proxy.conf <<EOF
-[Service]
-Environment="HTTP_PROXY=http://127.0.0.1:10809"
-Environment="HTTPS_PROXY=http://127.0.0.1:10809"
-Environment="NO_PROXY=localhost,127.0.0.1,registry.cn-hangzhou.aliyuncs.com"
-EOF
-```
-
-After that, reload the systemd configuration and restart the docker service:
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl restart docker
-```
-
-## Speed up Go
-
-To speed up Go module downloads in China, set the `GOPROXY` environment variable to use a local Go proxy.
-
-```Dockerfile
-ENV GOPROXY=https://goproxy.cn,direct
-```
+Run `./deploy.sh` to start the deployment process. Ensure your `.env` file is properly configured.

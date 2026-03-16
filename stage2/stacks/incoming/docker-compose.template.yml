@@ -19,6 +19,7 @@ services:
           # Allows internal services to resolve these domains directly to Caddy
           # without needing to go through Cloudflare or modify /etc/hosts
           ---DOMAINS---
+      frp_net:
     volumes:
       - sites-data:/data
     stop_grace_period: 60s
@@ -50,6 +51,23 @@ services:
         order: stop-first
         delay: 60s
 
+  frpc_ningbo:
+    image: localhost:8080/box_starting/local_frp
+    networks:
+      - frp_net
+    environment:
+      - FRP_SERVER={{FRP_SERVER}}
+      - FRP_TOKEN={{FRP_TOKEN}}
+    stop_grace_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 8G
+      update_config:
+        order: stop-first
+        delay: 60s
+
 volumes:
   sites-data:
     driver: local
@@ -62,4 +80,6 @@ networks:
   proxy_app:
     external: true
   clickhouse_net:
+    external: true
+  frp_net:
     external: true

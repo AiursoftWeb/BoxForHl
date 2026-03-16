@@ -1,0 +1,33 @@
+serverAddr = "FRP_SERVER_IP"
+serverPort = 7000
+auth.token = "FRP_TOKEN"
+transport.poolCount = 5
+transport.protocol = "kcp"
+transport.tcpMux = true
+webServer.addr = "0.0.0.0"
+webServer.port = 7400
+webServer.user = "admin"
+webServer.password = "admin"
+loginFailExit = true
+
+# HTTP Tunnel for Caddy
+[[proxies]]
+name = "http"
+type = "tcp"
+localIP = "incoming_sites"
+localPort = 80
+remotePort = 80
+transport.useCompression = true
+transport.proxyProtocolVersion = "v2"
+transport.bandwidthLimit = "3MB"
+
+# HTTPS Tunnel for Caddy
+[[proxies]]
+name = "https"
+type = "tcp"
+localIP = "incoming_sites"
+localPort = 443
+remotePort = 443
+transport.useCompression = true
+transport.proxyProtocolVersion = "v2"
+transport.bandwidthLimit = "3MB"
