@@ -5,6 +5,7 @@ services:
   downloader:
     image: localhost:8080/box_starting/local_puller
     environment:
+      - FROM_REGISTRY=pubhub.aiursoft.com
       - MIRROR_TARGET=hub.chopinsight.cn
       - DOCKER_USERNAME={{DOCKER_HUB_USERNAME}}
       - DOCKER_PASSWORD={{DOCKER_HUB_PASSWORD}}
