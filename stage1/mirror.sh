@@ -5,8 +5,8 @@ mirror_image() {
     local target="localhost:8080/public_mirror/${image}"
 
     echo "Mirroring image: $image"
-    sudo docker pull "$image"
-    sudo docker tag "$image" "$target"
+    sudo docker pull "pubhub.aiursoft.com/$image"
+    sudo docker tag "pubhub.aiursoft.com/$image" "$target"
     sudo docker push "$target"
 }
 
