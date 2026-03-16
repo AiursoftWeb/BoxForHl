@@ -44,7 +44,7 @@
 				}
 			},
 			"adminPolicy": {
-				"users": ["anduin@chopinsight.cn"],
+				"users": ["clare.xu@chopinsight.cn"],
 				"actions": ["read", "create", "update", "delete"]
 			}
 		},

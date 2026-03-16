@@ -1,6 +1,7 @@
 version: '3.9'
 
 services:
+  # Mission: Pull Public Images (PI) and Aiursoft Modified Images (MI) from Docker Hub
   downloader:
     image: localhost:8080/box_starting/local_puller
     environment:
@@ -10,8 +11,8 @@ services:
       - LOCAL_DOCKER_USERNAME={{LOCAL_DOCKER_USERNAME}}
       - LOCAL_DOCKER_PASSWORD={{LOCAL_DOCKER_PASSWORD}}
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - sync_records:/app/sync_records
+      - run_logs:/app/run_logs
     networks:
       - proxy_app
     stop_grace_period: 20s
@@ -25,10 +26,20 @@ services:
         order: start-first
         delay: 5s
 
-
 networks:
   proxy_app:
     external: true
 
 volumes:
   sync_records:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/puller-data/sync_records
+  run_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/puller-data/run_logs
