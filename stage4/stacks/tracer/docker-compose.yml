@@ -13,7 +13,7 @@ services:
       - ConnectionStrings__DbType=MySql
       - Storage__Path=/data/files
       - AppSettings__AuthProvider=OIDC
-      - AppSettings__OIDC__Authority=https://auth.chopinsight.cn/application/o/server-latency-test-cn
+      - AppSettings__OIDC__Authority=https://auth.chopinsight.cn/application/o/tracer
       - AppSettings__OIDC__ClientId={{TRACER_CLIENT_ID}}
       - AppSettings__OIDC__ClientSecret={{TRACER_CLIENT_SECRET}}
     networks:
@@ -32,7 +32,7 @@ services:
         delay: 60s
 
   db:
-    image: hub.aiursoft.cn/mysql
+    image: hub.chopinsight.cn/mysql
     volumes:
       - tracer-db:/var/lib/mysql
     environment:
