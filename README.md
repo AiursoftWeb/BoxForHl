@@ -23,3 +23,25 @@ To provide a self-contained, high-performance environment for hosting services o
 
 ## 🚀 Deployment
 Run `./deploy.sh` to start the deployment process. Ensure your `.env` file is properly configured.
+
+## TODO
+
+auth.chopinsight.cn
+clickhouse.chopinsight.cn
+grafana.chopinsight.cn
+hub.chopinsight.cn
+test.chopinsight.cn
+vikunja.chopinsight.cn
+gitlab.chopinsight.cn
+employee.chopinsight.cn
+stathub.chopinsight.cn
+marktohtml.chopinsight.cn
+openweb.chopinsight.cn
+ollama.chopinsight.cn
+ocr.chopinsight.cn
+nextcloud.chopinsight.cn
+vault.chopinsight.cn
+uptime.chopinsight.cn
+minio.chopinsight.cn
+litellm.chopinsight.cn
+tracer.chopinsight.cn
