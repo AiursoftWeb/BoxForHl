@@ -38,9 +38,6 @@ uptime.chopinsight.cn
 minio.chopinsight.cn
 litellm.chopinsight.cn
 
-employee.chopinsight.cn
-
-
 ## Done
 
 auth.chopinsight.cn
@@ -50,3 +47,4 @@ grafana.chopinsight.cn
 hub.chopinsight.cn
 vikunja.chopinsight.cn
 tracer.chopinsight.cn
+employee.chopinsight.cn
