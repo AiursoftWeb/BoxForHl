@@ -116,7 +116,6 @@ services:
       - ConnectionStrings__DbType=MySql
       - Storage__Path=/data/files
       - Underlyings__Ollama__Instance=http://ollama-server:11434/
-      - BingSearchAPIKey={{BING_SEARCH_KEY}}
       - ApiKey={{OLLAMA_GATEWAY_API_KEY}}
       - Clickhouse__Enabled=true
       - Clickhouse__ConnectionString=Host=clickhouse;Protocol=http;Port=8123;User=default;Password=123456;Database=default
