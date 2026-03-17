@@ -29,8 +29,6 @@ Run `./deploy.sh` to start the deployment process. Ensure your `.env` file is pr
 gitlab.chopinsight.cn
 stathub.chopinsight.cn
 marktohtml.chopinsight.cn
-openweb.chopinsight.cn
-ollama.chopinsight.cn
 ocr.chopinsight.cn
 nextcloud.chopinsight.cn
 vault.chopinsight.cn
@@ -48,3 +46,5 @@ hub.chopinsight.cn
 vikunja.chopinsight.cn
 tracer.chopinsight.cn
 employee.chopinsight.cn
+ollama.chopinsight.cn
+openweb.chopinsight.cn
