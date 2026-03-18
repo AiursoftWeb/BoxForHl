@@ -19,7 +19,7 @@ To provide a self-contained, high-performance environment for hosting services o
 *   **Stage 1:** Image Mirroring for essential services.
 *   **Stage 2:** Network infrastructure (Caddy, FRP, PySyncer).
 *   **Stage 3:** Advanced registries and Identity management (Zot, Puller, Authentik).
-*   **Stage 4:** Business applications (Vikunja).
+*   **Stage 4:** Business applications (Vikunja, StatHub, Tracer, etc.).
 
 ## 🚀 Deployment
 Run `./deploy.sh` to start the deployment process. Ensure your `.env` file is properly configured.
@@ -27,7 +27,6 @@ Run `./deploy.sh` to start the deployment process. Ensure your `.env` file is pr
 ## TODO
 
 gitlab.chopinsight.cn
-stathub.chopinsight.cn
 marktohtml.chopinsight.cn
 ocr.chopinsight.cn
 nextcloud.chopinsight.cn
@@ -45,6 +44,7 @@ grafana.chopinsight.cn
 hub.chopinsight.cn
 vikunja.chopinsight.cn
 tracer.chopinsight.cn
+stathub.chopinsight.cn
 employee.chopinsight.cn
 ollama.chopinsight.cn
 openweb.chopinsight.cn
