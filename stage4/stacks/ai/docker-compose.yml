@@ -45,35 +45,6 @@ services:
         delay: 5s
         max_attempts: 3
 
-  ollama-warmup:
-    depends_on:
-      - ollama-server
-    image: hub.chopinsight.cn/alpine
-    networks: 
-      - internal
-    entrypoint:
-      - "/bin/sh"
-      - "-c"
-      - |
-          apk add curl && \
-          sleep 40 && \
-          while true; do \
-            curl -s -o /dev/null http://ollama-server:11434/api/generate -d '{"model": "qwen3.5:27b-q8_0", "options": {"num_ctx": 32768}}' ; \
-            curl -s -o /dev/null http://ollama-server:11434/api/generate -d '{"model": "bge-m3:latest", "options": {"num_ctx": 8192}}' ; \
-            sleep 900; \
-          done
-    stop_grace_period: 20s
-    deploy:
-      labels:
-        shepherd.autoupdate: "true"
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 1G
-      update_config:
-        order: start-first
-        delay: 5s
-
   ollama-gateway-db:
     image: hub.chopinsight.cn/mysql
     volumes:
@@ -106,7 +77,6 @@ services:
   ollama-gateway-app:
     depends_on:
       - ollama-gateway-db
-      - ollama-warmup
     image: hub.chopinsight.cn/aiursoft/ollamagateway:latest
     volumes:
       - ollama-gateway-files:/data/files
