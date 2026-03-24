@@ -3,7 +3,7 @@ version: '3.9'
 
 services:
   authentik_proxy:
-    image: hub.chopinsight.cn/goauthentik/proxy:2025.12.3
+    image: hub.chopinsight.cn/ghcr.io/goauthentik/proxy:2025.12.3 
     volumes:
       - type: bind
         source: /dev/shm

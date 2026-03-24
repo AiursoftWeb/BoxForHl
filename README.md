@@ -31,12 +31,12 @@ marktohtml.chopinsight.cn
 ocr.chopinsight.cn
 nextcloud.chopinsight.cn
 vault.chopinsight.cn
-uptime.chopinsight.cn
 minio.chopinsight.cn
 litellm.chopinsight.cn
 
 ## Done
 
+uptime.chopinsight.cn
 auth.chopinsight.cn
 test.chopinsight.cn
 clickhouse.chopinsight.cn

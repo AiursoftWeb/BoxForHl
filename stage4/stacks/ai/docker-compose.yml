@@ -77,12 +77,12 @@ services:
   ollama-gateway-db:
     image: hub.chopinsight.cn/mysql
     volumes:
-      - gateway-db:/var/lib/mysql
+      - ollama-gateway-db:/var/lib/mysql
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=true
-      - MYSQL_DATABASE=chat
-      - MYSQL_USER=chat
-      - MYSQL_PASSWORD=<chat_password>
+      - MYSQL_DATABASE=ollama_gateway
+      - MYSQL_USER=ollama_gateway
+      - MYSQL_PASSWORD=<ollama_gateway_password>
     networks:
       - internal
     stop_grace_period: 60s
@@ -103,27 +103,29 @@ services:
         order: stop-first
         delay: 60s
 
-  ollama-gateway:
+  ollama-gateway-app:
     depends_on:
       - ollama-gateway-db
       - ollama-warmup
-    image: hub.chopinsight.cn/aiursoft/gptgateway
+    image: hub.chopinsight.cn/aiursoft/ollamagateway:latest
     volumes:
-      - gateway-data:/data/files
-      - gateway-aspnet:/data/.aspnet
+      - ollama-gateway-files:/data/files
+      - ollama-gateway-aspnet:/data/.aspnet
     environment:
-      - ConnectionStrings__DefaultConnection=Server=ollama-gateway-db;Database=chat;Uid=chat;Pwd=<chat_password>;
+      - ConnectionStrings__DefaultConnection=Server=ollama-gateway-db;Database=ollama_gateway;Uid=ollama_gateway;Pwd=<ollama_gateway_password>;
       - ConnectionStrings__DbType=MySql
       - Storage__Path=/data/files
-      - Underlyings__Ollama__Instance=http://ollama-server:11434/
-      - ApiKey={{OLLAMA_GATEWAY_API_KEY}}
+      - AppSettings__AuthProvider=OIDC
+      - AppSettings__OIDC__Authority=https://auth.chopinsight.cn/application/o/ollama-gateway
+      - AppSettings__OIDC__ClientId={{OLLAMA_GATEWAY_CLIENT_ID}}
+      - AppSettings__OIDC__ClientSecret={{OLLAMA_GATEWAY_CLIENT_SECRET}}
       - Clickhouse__Enabled=true
       - Clickhouse__ConnectionString=Host=clickhouse;Protocol=http;Port=8123;User=default;Password=123456;Database=default
     networks:
       - internal
       - proxy_app
       - clickhouse_net
-    stop_grace_period: 20s
+    stop_grace_period: 60s
     deploy:
       labels:
         shepherd.autoupdate: "true"
@@ -182,10 +184,10 @@ services:
   open-webui:
     depends_on:
       - mcpo
-      - ollama-gateway
+      - ollama-gateway-app
     image: hub.chopinsight.cn/ghcr.io/open-webui/open-webui:main
     environment:
-      - 'OLLAMA_BASE_URL=http://ollama-gateway:5000/'
+      - 'OLLAMA_BASE_URL=http://ollama-gateway-app:5000/'
       - ENABLE_OPENAI_API=False
       - WEBUI_AUTH=True
       - ENABLE_LOGIN_FORM=False
@@ -253,24 +255,6 @@ volumes:
       type: none
       o: bind
       device: /swarm-vol/ai/code-runner/aspnet
-  gateway-data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /swarm-vol/ai/gateway/data
-  gateway-aspnet:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /swarm-vol/ai/gateway/aspnet
-  gateway-db:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /swarm-vol/ai/gateway/db
   mcpo-data:
     driver: local
     driver_opts:
@@ -283,3 +267,21 @@ volumes:
       type: none
       o: bind
       device: /swarm-vol/ai/open-webui/data
+  ollama-gateway-files:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/ollama-gateway-data/files
+  ollama-gateway-aspnet:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/ollama-gateway-data/aspnet
+  ollama-gateway-db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/ollama-gateway-data/mysql

@@ -268,7 +268,6 @@ images=(
     "aiursoft/cpprunner"
     "aiursoft/employeecenter"
     "aiursoft/gitmirrorserver"
-    "aiursoft/gptgateway"
     "aiursoft/gateway"
     "aiursoft/kahla"
     "aiursoft/manhours"
