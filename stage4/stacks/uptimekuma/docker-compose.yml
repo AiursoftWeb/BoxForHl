@@ -1,0 +1,65 @@
+#docker run -d --restart=always -p 3001:3001 -v uptime-kuma:/app/data --name uptime-kuma louislam/uptime-kuma:1
+version: '3.9'
+
+services:
+  authentik_proxy:
+    image: hub.chopinsight.cn/goauthentik/proxy:2025.12.3
+    volumes:
+      - type: bind
+        source: /dev/shm
+        target: /dev/shm
+        read_only: false
+    environment:
+      AUTHENTIK_HOST: "https://auth.chopinsight.cn/"
+      AUTHENTIK_INSECURE: "false"
+      AUTHENTIK_TOKEN: "{{UPTIMEKUMA_OUTPOST_TOKEN}}"
+    stop_grace_period: 20s
+    networks:
+      - proxy_app
+      - internal
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+      update_config:
+        order: start-first
+        delay: 5s
+
+  server:
+    image: hub.chopinsight.cn/louislam/uptime-kuma:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - uptime-kuma:/app/data
+    environment:
+      - NODE_ENV=production
+    networks:
+      - proxy_app
+      - internal
+    stop_grace_period: 60s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+      update_config:
+        order: stop-first
+        delay: 60s
+
+networks:
+  proxy_app:
+    external: true
+  internal:
+    driver: overlay
+
+volumes:
+  uptime-kuma:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/uptime-kuma-data
