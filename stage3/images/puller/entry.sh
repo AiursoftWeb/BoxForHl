@@ -260,6 +260,7 @@ images=(
     "aiursoft/fissssssh-blog"
     "aiursoft/aiurdrive"
     "aiursoft/apkg"
+    "aiursoft/ollamagateway"
     "aiursoft/baget"
     "aiursoft/charter"
     "aiursoft/chessserver"
