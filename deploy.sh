@@ -642,6 +642,20 @@ print_warn "   Starting stage 4: Mission is to deploy business stacks"
 print_warn "=============================================================================="
 sleep 3
 
+print_ok "Building local runner..."
+sudo docker build --network=host ./stage4/images/runner -t localhost:8080/box_starting/local_runner:latest
+sudo docker push localhost:8080/box_starting/local_runner:latest
+
+print_ok "Ensuring binfmt support for multi-arch builds..."
+if [ -f /proc/sys/fs/binfmt_misc/qemu-aarch64 ]; then
+    print_ok "QEMU binfmt already registered in kernel. Skipping."
+else
+    print_warn "QEMU binfmt not found. Registering via tonistiigi/binfmt..."
+    sudo docker run --privileged --rm tonistiigi/binfmt --install all
+    print_ok "QEMU binfmt registered. Supported platforms:"
+    ls /proc/sys/fs/binfmt_misc/ | grep qemu || true
+fi
+
 # /swarm-vol/click-house/config_override.xml
 print_ok "Copying ClickHouse config override file..."
 sudo cp ./stage4/stacks/clickhouse/users_override.xml /swarm-vol/click-house/users_override.xml || true
