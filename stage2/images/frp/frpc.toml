@@ -48,7 +48,7 @@ transport.bandwidthLimit = "3MB"
 [[proxies]]
 name = "postgresql"
 type = "tcp"
-localIP = "pg_postgres"
+localIP = "pg_postgresql"
 localPort = 5432
 remotePort = 5432
 transport.useCompression = true
