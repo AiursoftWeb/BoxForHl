@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  app:
+    image: hub.chopinsight.cn/chopinsight/internalimages/paddleocr:latest
+    volumes:
+      - type: tmpfs
+        target: /dev/shm
+    environment:
+      # Optional: If you want to require authentication for API calls, set this in your .env
+      - OCR_ACCESS_TOKEN={{OCR_ACCESS_TOKEN}}
+      - USE_GPU=true # Set to false to force CPU mode
+    networks:
+      - proxy_app
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    stop_grace_period: 20s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 12G
+      update_config:
+        order: start-first
+        delay: 5s
+
+networks:
+  proxy_app:
+    external: true
+  internal:
+    driver: overlay
