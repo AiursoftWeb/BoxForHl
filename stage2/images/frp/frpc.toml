@@ -42,3 +42,14 @@ remotePort = 2202
 
 transport.useCompression = true
 transport.bandwidthLimit = "3MB"
+
+
+# PostgreSQL Tunnel for ChopInsight
+[[proxies]]
+name = "postgresql"
+type = "tcp"
+localIP = "pg_postgres"
+localPort = 5432
+remotePort = 5432
+transport.useCompression = true
+transport.bandwidthLimit = "3MB"
