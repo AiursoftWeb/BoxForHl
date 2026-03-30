@@ -16,9 +16,13 @@ services:
       - AppSettings__OIDC__Authority=https://auth.chopinsight.cn/application/o/stathub
       - AppSettings__OIDC__ClientId={{STATHUB_CLIENT_ID}}
       - AppSettings__OIDC__ClientSecret={{STATHUB_CLIENT_SECRET}}
+      - Logging__Clickhouse__Enabled=true
+      - Logging__Clickhouse__ConnectionString=Host=clickhouse;User=default;Password=123456;Database=AspNetCoreLogs
+      - Logging__Clickhouse__TableName=StathubLogs
     networks:
       - proxy_app
       - internal
+      - clickhouse_net
     stop_grace_period: 60s
     deploy:
       labels:
@@ -76,6 +80,8 @@ volumes:
 
 networks:
   proxy_app:
+    external: true
+  clickhouse_net:
     external: true
   internal:
     driver: overlay
