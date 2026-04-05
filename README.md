@@ -136,11 +136,22 @@ networks:
 
 ---
 
-### 6. Ports
+### 6. How to Expose a Service
 
-Direct port publishing is **strongly discouraged**. All HTTP/HTTPS traffic must flow through Caddy via `proxy_app`. All TCP tunneling must use FRP via `frp_net`.
+#### 6a. Exposing a Web Service (the easy path)
 
-When a port **must** be published (e.g. SSH for GitLab, raw database via FRP), use the long-form syntax with `mode: host`:
+For any HTTP-based service, **do not publish ports 80 or 443**. Caddy is already listening on those ports on the host and handles all TLS termination. The only thing needed is:
+
+1. Attach the service to the `proxy_app` network.
+2. Create a `<stack>.conf` file with a `reverse_proxy` block pointing at the container (see §14).
+
+Caddy will pick up the new `.conf` file on next deploy and start routing traffic. No port mapping, no firewall changes.
+
+#### 6b. Exposing a Non-HTTP Port (the painful path)
+
+Exposing a raw TCP/UDP port (e.g. SSH, PostgreSQL) requires **two things** to work together:
+
+**Step 1 — Publish the port on the Swarm node** (so the host OS listens):
 
 ```yaml
 ports:
@@ -149,6 +160,12 @@ ports:
     protocol: tcp
     mode: host
 ```
+
+**Step 2 — Add an FRP inbound rule** so external traffic is tunneled from the public IP to this port via `frp_net`. The service must also be attached to `frp_net`.
+
+Both steps are required. Publishing the port alone only makes it reachable on the private node IP. Adding FRP alone has nothing to forward to. If either is missing, the port will not be reachable externally.
+
+Always use the long-form port syntax with `mode: host`.
 
 ---
 
