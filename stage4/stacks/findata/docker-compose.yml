@@ -15,7 +15,6 @@ services:
       - USE_GPU=false
       - MAX_CONCURRENT_TASKS=5
     networks:
-      - proxy_app
       - internal
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
@@ -36,7 +35,5 @@ services:
         delay: 5s
 
 networks:
-  proxy_app:
-    external: true
   internal:
     driver: overlay
