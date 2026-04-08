@@ -35,6 +35,23 @@ services:
         order: stop-first
         delay: 60s
 
+  findata-initializer:
+    depends_on:
+      - postgresql
+    image: hub.chopinsight.cn/chopinsight/internalimages/findata_initializer:latest
+    environment:
+      - PG_HOST=postgresql
+      - PG_PORT=5432
+      - PG_USER=chopinsight
+      - PG_PASSWORD={{PG_PASSWORD}}
+      - PG_DB=chopinsight
+    networks:
+      - internal
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+
   findata-engine:
     depends_on:
       - postgresql
