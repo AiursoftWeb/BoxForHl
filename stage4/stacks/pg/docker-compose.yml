@@ -19,13 +19,13 @@ services:
         published: 5432
         protocol: tcp
         mode: host
-    stop_grace_period: 60s
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
       start_period: 20s
       interval: 30s
       retries: 5
       timeout: 5s
+    stop_grace_period: 60s
     deploy:
       resources:
         limits:
@@ -35,29 +35,70 @@ services:
         order: stop-first
         delay: 60s
 
-  findata-engine:
+  findata-initializer:
     depends_on:
       - postgresql
-    image: hub.chopinsight.cn/chopinsight/internalimages/findata_engine:latest
+    image: hub.chopinsight.cn/chopinsight/internalimages/findata_initializer:latest
     environment:
       - PG_HOST=postgresql
       - PG_PORT=5432
       - PG_USER=chopinsight
       - PG_PASSWORD={{PG_PASSWORD}}
       - PG_DB=chopinsight
-      - EMBEDDING_API_URL={{FINDATA_EMBEDDING_API_URL}}
+    networks:
+      - internal
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      restart_policy:
+        condition: none
+
+  findata-engine:
+    depends_on:
+      - postgresql
+    image: hub.chopinsight.cn/chopinsight/internalimages/findata_engine:latest
+    volumes:
+      - findata-pdfs:/tmp/findata_pdfs
+    environment:
+      # PostgreSQL
+      - PG_HOST=postgresql
+      - PG_PORT=5432
+      - PG_USER=chopinsight
+      - PG_PASSWORD={{PG_PASSWORD}}
+      - PG_DB=chopinsight
+      # MySQL (main_factory)
+      - MYSQL_HOST=139.9.132.162
+      - MYSQL_PORT=3306
+      - MYSQL_USER=db_yuzhong_v2
+      - MYSQL_PASSWORD={{FINDATA_MYSQL_PASSWORD}}
+      - MYSQL_DB=db_yuzhong_v2
+      # Ollama embedding (外部接口)
+      - OLLAMA_GATEWAY_URL=https://ollama.chopinsight.cn
+      - OLLAMA_EMBEDDING_MODEL=nomic-embed-text
+      - OLLAMA_API_KEY={{OLLAMA_API_KEY}}
+      # 豆包 embedding (兜底)
+      - EMBEDDING_API_URL=https://ark.cn-beijing.volces.com/api/v3
       - EMBEDDING_API_KEY={{FINDATA_EMBEDDING_API_KEY}}
+      # MinIO (chopart 本机)
+      - MINIO_ENDPOINT=minio_minio:9000
+      - MINIO_ACCESS_KEY={{MINIO_ROOT_USER}}
+      - MINIO_SECRET_KEY={{MINIO_ROOT_PASSWORD}}
+      - MINIO_BUCKET=finreports
+      - MINIO_SECURE=false
+      - MINIO_EXTERNAL_URL=https://minio.chopinsight.cn
+      # OCR
       - OCR_API_URL=http://ocr_app:8000/api/ocr
-      - USE_GPU=false
+      # PDF
+      - PDF_DOWNLOAD_DIR=/tmp/findata_pdfs
+      # Vectorizer
+      - EMBEDDING_DIMENSION=768
+      - EMBEDDING_CHUNK_SIZE=1200
+      - EMBEDDING_CHUNK_OVERLAP=1000
+      - EMBEDDING_LEAF_ONLY=true
       - MAX_CONCURRENT_TASKS=5
     networks:
       - internal
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
-      start_period: 30s
-      interval: 30s
-      retries: 3
-      timeout: 10s
+      - proxy_app
     stop_grace_period: 20s
     deploy:
       labels:
@@ -65,16 +106,22 @@ services:
       resources:
         limits:
           cpus: '2.0'
-          memory: 2G
+          memory: 4G
       update_config:
         order: start-first
         delay: 5s
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
 
 networks:
   frp_net:
     external: true
   internal:
     driver: overlay
+  proxy_app:
+    external: true
 
 volumes:
   database:
@@ -83,3 +130,9 @@ volumes:
       type: none
       o: bind
       device: /swarm-vol/chopinsight-postgres/postgres-database
+  findata-pdfs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/findata-engine/pdfs
