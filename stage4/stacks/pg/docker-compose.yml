@@ -19,13 +19,13 @@ services:
         published: 5432
         protocol: tcp
         mode: host
-    stop_grace_period: 60s
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
       start_period: 20s
       interval: 30s
       retries: 5
       timeout: 5s
+    stop_grace_period: 60s
     deploy:
       resources:
         limits:
@@ -48,9 +48,10 @@ services:
     networks:
       - internal
     deploy:
+      labels:
+        shepherd.autoupdate: "true"
       restart_policy:
-        condition: on-failure
-        max_attempts: 3
+        condition: none
 
   findata-engine:
     depends_on:
@@ -98,12 +99,6 @@ services:
     networks:
       - internal
       - proxy_app
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
-      start_period: 30s
-      interval: 30s
-      retries: 3
-      timeout: 10s
     stop_grace_period: 20s
     deploy:
       labels:
@@ -111,10 +106,14 @@ services:
       resources:
         limits:
           cpus: '2.0'
-          memory: 2G
+          memory: 4G
       update_config:
         order: start-first
         delay: 5s
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
 
 networks:
   frp_net:
