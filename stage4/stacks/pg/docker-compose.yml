@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   postgresql:
-    image: hub.chopinsight.cn/postgres:16-alpine
+    image: hub.chopinsight.cn/chopinsight/internalimages/my_customized_pg:latest
     volumes:
       - database:/var/lib/postgresql/data
     environment:
