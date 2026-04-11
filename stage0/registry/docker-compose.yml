@@ -3,7 +3,7 @@ services:
     depends_on:
       - registry-server
     restart: unless-stopped
-    image: hub.chopinsight.cn/chopinsight/internalimages/registry-ui:latest
+    image: joxit/docker-registry-ui
     ports:
       - target: 80
         published: 8080
@@ -27,7 +27,7 @@ services:
 
   registry-server:
     restart: unless-stopped
-    image: hub.chopinsight.cn/chopinsight/internalimages/registry:latest
+    image: registry:3
     volumes:
       - registry-data:/var/lib/registry
     networks:
