@@ -45,6 +45,7 @@ services:
       - PG_USER=chopinsight
       - PG_PASSWORD={{PG_PASSWORD}}
       - PG_DB=chopinsight
+      - REINIT=true
     networks:
       - internal
     stop_grace_period: 60s
