@@ -88,7 +88,7 @@ services:
       - EMBEDDING_API_URL=https://ark.cn-beijing.volces.com/api/v3
       - EMBEDDING_API_KEY={{FINDATA_EMBEDDING_API_KEY}}
       # MinIO (chopart 本机)
-      - MINIO_ENDPOINT=minio_minio:9000
+      - MINIO_ENDPOINT=minio:9000
       - MINIO_ACCESS_KEY={{MINIO_ROOT_USER}}
       - MINIO_SECRET_KEY={{MINIO_ROOT_PASSWORD}}
       - MINIO_BUCKET=finreports

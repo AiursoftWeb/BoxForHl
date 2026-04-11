@@ -10,8 +10,12 @@ services:
       - MINIO_ROOT_USER={{MINIO_ROOT_USER}}
       - MINIO_ROOT_PASSWORD={{MINIO_ROOT_PASSWORD}}
     networks:
-      - proxy_app
-      - internal
+      proxy_app:
+        aliases:
+          - minio
+      internal:
+        aliases:
+          - minio
     healthcheck:
       test: ["CMD-SHELL", "mc ready local || exit 1"]
       interval: 30s
