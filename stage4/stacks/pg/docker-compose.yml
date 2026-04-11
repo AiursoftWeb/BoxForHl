@@ -83,7 +83,7 @@ services:
       - MYSQL_DB=db_yuzhong_v2
       # Ollama embedding (外部接口)
       - OLLAMA_GATEWAY_URL=https://ollama.chopinsight.cn
-      - OLLAMA_EMBEDDING_MODEL=nomic-embed-text
+      - OLLAMA_EMBEDDING_MODEL=bge-m3:latest
       - OLLAMA_API_KEY={{OLLAMA_API_KEY}}
       # 豆包 embedding (兜底)
       - EMBEDDING_API_URL=https://ark.cn-beijing.volces.com/api/v3
@@ -101,7 +101,7 @@ services:
       # PDF
       - PDF_DOWNLOAD_DIR=/tmp/findata_pdfs
       # Vectorizer
-      - EMBEDDING_DIMENSION=768
+      - EMBEDDING_DIMENSION=1024
       - EMBEDDING_CHUNK_SIZE=1200
       - EMBEDDING_CHUNK_OVERLAP=1000
       - EMBEDDING_LEAF_ONLY=true
