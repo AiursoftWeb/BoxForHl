@@ -1,0 +1,87 @@
+version: "3.9"
+
+services:
+  app:
+    depends_on:
+      - db
+    image: hub.chopinsight.cn/aiursoft/polls:latest
+    volumes:
+      - polls-aspnet:/data/.aspnet/
+      - polls-files:/data/files
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Database=polls;Uid=polls;Pwd=<polls_password>;
+      - ConnectionStrings__DbType=MySql
+      - Storage__Path=/data/files
+      - AppSettings__AuthProvider=OIDC
+      - AppSettings__OIDC__Authority=https://auth.chopinsight.cn/application/o/polls
+      - AppSettings__OIDC__ClientId={{POLLS_CLIENT_ID}}
+      - AppSettings__OIDC__ClientSecret={{POLLS_CLIENT_SECRET}}
+      - Logging__Clickhouse__Enabled=true
+      - Logging__Clickhouse__ConnectionString=Host=clickhouse;User=default;Password=123456;Database=AspNetCoreLogs
+      - Logging__Clickhouse__TableName=PollsLogs
+    networks:
+      - proxy_app
+      - internal
+      - clickhouse_net
+    stop_grace_period: 20s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+      update_config:
+        order: start-first
+        delay: 5s
+
+  db:
+    image: hub.chopinsight.cn/mysql
+    volumes:
+      - polls-db:/var/lib/mysql
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
+      - MYSQL_DATABASE=polls
+      - MYSQL_USER=polls
+      - MYSQL_PASSWORD=<polls_password>
+    networks:
+      - internal
+    stop_grace_period: 60s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+      update_config:
+        order: stop-first
+        delay: 60s
+
+volumes:
+  polls-files:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/polls-data/files
+  polls-aspnet:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/polls-data/aspnet
+  polls-db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/polls-data/mysql
+
+networks:
+  proxy_app:
+    external: true
+  clickhouse_net:
+    external: true
+  internal:
+    driver: overlay

@@ -1,0 +1,90 @@
+version: "3.9"
+
+services:
+  app:
+    depends_on:
+      - db
+    image: hub.chopinsight.cn/aiursoft/translate:latest
+    volumes:
+      - translate-aspnet:/data/.aspnet/
+      - translate-files:/data/files
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Database=mth;Uid=mth;Pwd=<mth_password>;
+      - ConnectionStrings__DbType=MySql
+      - Storage__Path=/data/files
+      - AppSettings__AuthProvider=OIDC
+      - AppSettings__OIDC__Authority=https://auth.chopinsight.cn/application/o/translate
+      - AppSettings__OIDC__ClientId={{TRANSLATE_CLIENT_ID}}
+      - AppSettings__OIDC__ClientSecret={{TRANSLATE_CLIENT_SECRET}}
+      - Logging__Clickhouse__Enabled=true
+      - Logging__Clickhouse__ConnectionString=Host=clickhouse;User=default;Password=123456;Database=AspNetCoreLogs
+      - Logging__Clickhouse__TableName=translate
+      - OpenAI__CompletionApiUrl=https://ollama.chopinsight.cn/v1/chat/completions
+      - OpenAI__Model=aiursoft-instruct:latest
+      - OpenAI__Token={{TRANSLATE_OLLAMA_GATEWAY_API_KEY}}
+    networks:
+      - proxy_app
+      - internal
+      - clickhouse_net
+    stop_grace_period: 20s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+      update_config:
+        order: start-first
+        delay: 5s
+
+  db:
+    image: hub.chopinsight.cn/mysql
+    volumes:
+      - translate-db:/var/lib/mysql
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
+      - MYSQL_DATABASE=mth
+      - MYSQL_USER=mth
+      - MYSQL_PASSWORD=<mth_password>
+    networks:
+      - internal
+    stop_grace_period: 60s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+      update_config:
+        order: stop-first
+        delay: 60s
+
+volumes:
+  translate-files:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/translate-data/files
+  translate-aspnet:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/translate-data/aspnet
+  translate-db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/translate-data/mysql
+
+networks:
+  proxy_app:
+    external: true
+  clickhouse_net:
+    external: true
+  internal:
+    driver: overlay
