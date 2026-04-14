@@ -45,22 +45,18 @@ services:
       - PG_USER=chopinsight
       - PG_PASSWORD={{PG_PASSWORD}}
       - PG_DB=chopinsight
-      - REINIT=true
     networks:
       - internal
-    stop_grace_period: 60s
     deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 1G
       labels:
         shepherd.autoupdate: "true"
       restart_policy:
-        condition: none
-      update_config:
-        order: stop-first
-        delay: 60s
+        condition: on-failure
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
 
   findata-engine:
     depends_on:

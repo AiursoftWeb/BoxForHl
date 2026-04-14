@@ -436,3 +436,4 @@ ollama.chopinsight.cn
 openweb.chopinsight.cn
 ocr.chopinsight.cn
 gitlab.chopinsight.cn
+tty.chopinsight.cn
