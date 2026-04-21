@@ -58,6 +58,28 @@ services:
           cpus: '0.5'
           memory: 256M
 
+  prospectus-cleanup:
+    depends_on:
+      - postgresql
+    image: hub.chopinsight.cn/chopinsight/internalimages/prospectus_cleanup:latest
+    volumes:
+      - findata-pdfs:/tmp/findata_pdfs
+    environment:
+      - PG_HOST=postgresql
+      - PG_PORT=5432
+      - PG_USER=chopinsight
+      - PG_PASSWORD={{PG_PASSWORD}}
+      - PG_DB=chopinsight
+    networks:
+      - internal
+    deploy:
+      restart_policy:
+        condition: none
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
   findata-engine:
     depends_on:
       - postgresql
