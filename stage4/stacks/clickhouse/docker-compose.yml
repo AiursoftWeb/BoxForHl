@@ -47,6 +47,35 @@ services:
         order: stop-first
         delay: 60s
 
+  level2_ch:
+    image: hub.chopinsight.cn/chopinsight/internalimages/customerclickhouse:latest
+    environment:
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD={{LEVEL2_CH_PASSWORD}}
+      - CLICKHOUSE_TELEMETRY_OPT_OUT=1
+      - CLICKHOUSE_DO_NOT_CHECK_UPDATES=1
+    networks:
+      - proxy_app
+      - clickhouse_net
+    volumes:
+      - level2-ch-data:/var/lib/clickhouse
+    stop_grace_period: 60s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 16G
+      update_config:
+        order: stop-first
+        delay: 60s
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 networks:
   clickhouse_net:
     external: true
@@ -60,3 +89,9 @@ volumes:
       type: none
       o: bind
       device: /swarm-vol/click-house/db-data
+  level2-ch-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/click-house/level2-data
