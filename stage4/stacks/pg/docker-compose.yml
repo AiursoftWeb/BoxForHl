@@ -170,7 +170,7 @@ services:
       - MYSQL_HOST=139.9.132.162
       - MYSQL_PORT=3306
       - MYSQL_USER=db_yuzhong_v2
-      - MYSQL_PASSWORD={{MYSQL_PASSWORD}}
+      - MYSQL_PASSWORD={{FINDATA_MYSQL_PASSWORD}}
       - MYSQL_DB=db_yuzhong_v2
       # Ollama
       - OLLAMA_GATEWAY_URL=https://ollama.chopinsight.cn
