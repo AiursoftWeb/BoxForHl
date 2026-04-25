@@ -64,6 +64,7 @@ services:
     image: hub.chopinsight.cn/chopinsight/internalimages/findata_engine:latest
     volumes:
       - findata-pdfs:/tmp/findata_pdfs
+    # Note: 1000+ page PDFs need >4G memory for text extraction
     environment:
       # PostgreSQL
       - PG_HOST=postgresql
@@ -124,8 +125,8 @@ services:
         shepherd.autoupdate: "true"
       resources:
         limits:
-          cpus: '2.0'
-          memory: 4G
+          cpus: '4.0'
+          memory: 8G
       update_config:
         order: start-first
         delay: 5s
