@@ -71,7 +71,7 @@ services:
         order: stop-first
         delay: 60s
     healthcheck:
-      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      test: ["CMD", "clickhouse-client", "--port", "9001", "--query", "SELECT 1"]
       interval: 30s
       timeout: 10s
       retries: 3
