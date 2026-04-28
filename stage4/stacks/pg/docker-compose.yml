@@ -155,6 +155,12 @@ services:
       - OLLAMA_GATEWAY_URL=https://ollama.chopinsight.cn
       - OLLAMA_CHAT_MODEL=aiursoft-instruct:latest
       - OLLAMA_API_KEY={{OLLAMA_API_KEY}}
+      # ClickHouse 日志
+      - CLICKHOUSE_HOST=clickhouse_clickhouse
+      - CLICKHOUSE_PORT=8123
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD={{CLICKHOUSE_PASSWORD}}
+      - CLICKHOUSE_DB=operation_engine
       # 服务配置
       - DEBUG=false
       - SCAN_INTERVAL_MINUTES=60
@@ -163,6 +169,7 @@ services:
     networks:
       - internal
       - proxy_app
+      - clickhouse_net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8201/health"]
       interval: 30s
@@ -194,6 +201,8 @@ networks:
   internal:
     driver: overlay
   proxy_app:
+    external: true
+  clickhouse_net:
     external: true
 
 volumes:
