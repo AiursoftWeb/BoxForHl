@@ -1,0 +1,138 @@
+version: "3.9"
+
+services:
+  clickhouse:
+    image: hub.chopinsight.cn/chopinsight/internalimages/level2_clickhouse:latest
+
+    environment:
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=123456
+      - CLICKHOUSE_TELEMETRY_OPT_OUT=1
+      - CLICKHOUSE_DO_NOT_CHECK_UPDATES=1
+
+    volumes:
+      - /swarm-vol/level2/clickhouse-data:/var/lib/clickhouse
+      - /swarm-vol/level2/clickhouse-log:/var/log/clickhouse-server
+
+    networks:
+      - internal
+      - proxy_app
+      - clickhouse_net
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8124/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+    stop_grace_period: 60s
+
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        order: stop-first
+        delay: 60s
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: "8.0"
+          memory: 16G
+        reservations:
+          cpus: "2.0"
+          memory: 4G
+      labels:
+        - "shepherd.autoupdate=true"
+
+  initializer:
+    image: hub.chopinsight.cn/chopinsight/internalimages/level2_initializer:latest
+
+    environment:
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_PORT: "8124"
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: "123456"
+
+    networks:
+      - internal
+
+    depends_on:
+      - clickhouse
+
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+  etl:
+    image: hub.chopinsight.cn/chopinsight/internalimages/level2_etl:latest
+
+    volumes:
+      - /swarm-vol/level2/etl-cache:/data
+
+    environment:
+      # SFTP 数据源
+      SFTP_PASSWORD: "{{SFTP_PASSWORD}}"
+      # ClickHouse
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_PORT: "8124"
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: "123456"
+
+    networks:
+      - internal
+      - clickhouse_net
+
+    depends_on:
+      - clickhouse
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8202/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+    stop_grace_period: 20s
+
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        order: start-first
+        delay: 5s
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: "8.0"
+          memory: 8G
+        reservations:
+          cpus: "2.0"
+          memory: 2G
+      labels:
+        - "shepherd.autoupdate=true"
+
+networks:
+  internal:
+    driver: overlay
+  proxy_app:
+    external: true
+    name: proxy_app
+  clickhouse_net:
+    external: true
+    name: clickhouse_net
