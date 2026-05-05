@@ -20,7 +20,7 @@ services:
       - clickhouse_net
 
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8124/ping"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8124/ping"]
       interval: 30s
       timeout: 5s
       retries: 3
