@@ -45,8 +45,6 @@ services:
         reservations:
           cpus: "2.0"
           memory: 4G
-      labels:
-        - "shepherd.autoupdate=true"
 
   initializer:
     image: hub.chopinsight.cn/chopinsight/internalimages/level2_initializer:latest
