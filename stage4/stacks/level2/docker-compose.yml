@@ -122,6 +122,55 @@ services:
       labels:
         - "shepherd.autoupdate=true"
 
+  sync:
+    image: hub.chopinsight.cn/chopinsight/internalimages/level2_sync:latest
+
+    volumes:
+      - sync-checkpoints:/data/checkpoints
+
+    environment:
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_PORT: "8124"
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: "123456"
+
+    networks:
+      - internal
+      - clickhouse_net
+
+    depends_on:
+      - clickhouse
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8203/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+    stop_grace_period: 20s
+
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        order: start-first
+        delay: 5s
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 4G
+        reservations:
+          cpus: "1.0"
+          memory: 1G
+      labels:
+        - "shepherd.autoupdate=true"
+
 networks:
   internal:
     driver: overlay
@@ -151,3 +200,9 @@ volumes:
       type: none
       o: bind
       device: /swarm-vol/level2/etl-cache
+  sync-checkpoints:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/level2/sync-checkpoints
