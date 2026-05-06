@@ -11,8 +11,8 @@ services:
       - CLICKHOUSE_DO_NOT_CHECK_UPDATES=1
 
     volumes:
-      - /swarm-vol/level2/clickhouse-data:/var/lib/clickhouse
-      - /swarm-vol/level2/clickhouse-log:/var/log/clickhouse-server
+      - clickhouse-data:/var/lib/clickhouse
+      - clickhouse-log:/var/log/clickhouse-server
 
     networks:
       - internal
@@ -76,12 +76,10 @@ services:
     image: hub.chopinsight.cn/chopinsight/internalimages/level2_etl:latest
 
     volumes:
-      - /swarm-vol/level2/etl-cache:/data
+      - etl-cache:/data
 
     environment:
-      # SFTP 数据源
       SFTP_PASSWORD: "0zRCQCPgPk48R8jy0jv5rdfAjaSHu9NS-a2Dgt9QJ-A="
-      # ClickHouse
       CLICKHOUSE_HOST: clickhouse
       CLICKHOUSE_PORT: "8124"
       CLICKHOUSE_USER: default
@@ -133,3 +131,23 @@ networks:
   clickhouse_net:
     external: true
     name: clickhouse_net
+
+volumes:
+  clickhouse-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/level2/clickhouse-data
+  clickhouse-log:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/level2/clickhouse-log
+  etl-cache:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/level2/etl-cache
