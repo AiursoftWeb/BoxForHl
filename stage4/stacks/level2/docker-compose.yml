@@ -109,9 +109,8 @@ services:
         order: start-first
         delay: 5s
       restart_policy:
-        condition: on-failure
-        delay: 10s
-        max_attempts: 3
+        condition: any
+        delay: 30s
       resources:
         limits:
           cpus: "8.0"
