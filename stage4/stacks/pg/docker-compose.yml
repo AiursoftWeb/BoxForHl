@@ -208,6 +208,63 @@ services:
         delay: 10s
         max_attempts: 3
 
+  valuation-engine:
+    depends_on:
+      - postgresql
+    image: hub.chopinsight.cn/chopinsight/internalimages/valuation_engine:latest
+    environment:
+      # PostgreSQL (同 stack 内直接用服务名；读 ai_valuation_report_md)
+      - PG_HOST=postgresql
+      - PG_PORT=5432
+      - PG_USER=chopinsight
+      - PG_PASSWORD={{PG_PASSWORD}}
+      - PG_DB=chopinsight
+      # MySQL (db_yuzhong_v2；读写 chong_valuation_*_v1)
+      - MYSQL_HOST=139.9.132.162
+      - MYSQL_PORT=3306
+      - MYSQL_USER=db_yuzhong_v2
+      - MYSQL_PASSWORD={{FINDATA_MYSQL_PASSWORD}}
+      - MYSQL_DB=db_yuzhong_v2
+      # Ollama
+      - OLLAMA_GATEWAY_URL=https://ollama.chopinsight.cn
+      - OLLAMA_CHAT_MODEL=aiursoft-instruct:latest
+      - OLLAMA_API_KEY={{OLLAMA_API_KEY}}
+      # 服务配置
+      - DEBUG=false
+      - SCAN_INTERVAL_MINUTES=60
+      - SCAN_INTERVAL_ACTIVE_MINUTES=10
+      - SCAN_ACTIVE_DAYS=3
+      - MAX_CONCURRENT_TASKS=3
+      - MAX_CONCURRENT_OLLAMA=1
+      - MAX_RETRY_COUNT=3
+    networks:
+      - internal
+      - proxy_app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8202/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    stop_grace_period: 20s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+      update_config:
+        order: start-first
+        delay: 5s
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+
 networks:
   frp_net:
     external: true
