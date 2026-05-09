@@ -20,6 +20,6 @@ scrape_configs:
   - job_name: valuation-engine
     metrics_path: /metrics
     static_configs:
-      - targets: ["pg_valuation-engine:8202"]
+      - targets: ["pg_valuation-engine:8204"]
         labels:
           service: valuation-engine
