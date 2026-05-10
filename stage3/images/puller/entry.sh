@@ -384,6 +384,7 @@ images=(
     "mongo"
     "mwader/postfix-relay"
     "mysql"
+    "mysql:9.7.0"
     "neosmemo/memos:stable"
     "nextcloud"
     "nextcloud:27.1.0"
