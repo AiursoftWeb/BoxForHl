@@ -39,7 +39,7 @@ services:
         delay: 5s
 
   db:
-    image: hub.chopinsight.cn/mysql
+    image: hub.chopinsight.cn/mysql:9.7.0
     volumes:
       - translate-db:/var/lib/mysql
     environment:

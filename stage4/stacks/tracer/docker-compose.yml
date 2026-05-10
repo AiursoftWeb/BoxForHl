@@ -36,7 +36,7 @@ services:
         delay: 60s
 
   db:
-    image: hub.chopinsight.cn/mysql
+    image: hub.chopinsight.cn/mysql:9.7.0
     volumes:
       - tracer-db:/var/lib/mysql
     environment:

@@ -46,7 +46,7 @@ services:
         max_attempts: 3
 
   ollama-gateway-db:
-    image: hub.chopinsight.cn/mysql
+    image: hub.chopinsight.cn/mysql:9.7.0
     volumes:
       - ollama-gateway-db:/var/lib/mysql
     environment:
