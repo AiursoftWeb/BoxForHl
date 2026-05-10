@@ -88,6 +88,7 @@ services:
     networks:
       - internal
       - clickhouse_net
+      - proxy_app
 
     depends_on:
       - clickhouse
