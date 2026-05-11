@@ -212,26 +212,6 @@ services:
         order: stop-first
         delay: 60s
 
-  anthropic-proxy:
-    image: hub.chopinsight.cn/chopinsight/internalimages/anthropic_proxy:latest
-    environment:
-      - UPSTREAM_URL=http://ollama-gateway-app:5000/v1/chat/completions
-      - UPSTREAM_TIMEOUT=300
-    networks:
-      - internal
-      - proxy_app
-    stop_grace_period: 20s
-    deploy:
-      labels:
-        shepherd.autoupdate: "true"
-      resources:
-        limits:
-          cpus: '2.0'
-          memory: 1G
-      update_config:
-        order: start-first
-        delay: 5s
-
 networks:
   internal:
     driver: overlay
