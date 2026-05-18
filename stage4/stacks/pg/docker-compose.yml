@@ -254,7 +254,7 @@ services:
         max_attempts: 3
 
   api-gateway:
-    image: hub.chopinsight.cn/chopinsight/conghua_api/api_gateway:latest
+    image: hub.chopinsight.cn/chopinsight/internalimages/api_gateway:latest
     environment:
       - MYSQL_HOST=139.9.132.162
       - MYSQL_PORT=3306
