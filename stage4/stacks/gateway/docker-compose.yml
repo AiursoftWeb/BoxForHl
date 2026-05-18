@@ -1,48 +1,16 @@
 version: '3.9'
 
 services:
-  mysql:
-    image: hub.chopinsight.cn/mysql:9.7.0
-    volumes:
-      - mysql-data:/var/lib/mysql
-    environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD=true
-      - MYSQL_DATABASE=chopinsight_api
-      - MYSQL_USER=api_gateway
-      - MYSQL_PASSWORD={{API_GATEWAY_MYSQL_PASSWORD}}
-    networks:
-      - internal
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root --silent"]
-      start_period: 20s
-      interval: 30s
-      retries: 5
-      timeout: 5s
-    stop_grace_period: 60s
-    deploy:
-      labels:
-        shepherd.autoupdate: "true"
-      resources:
-        limits:
-          cpus: '2.0'
-          memory: 4G
-      update_config:
-        order: stop-first
-        delay: 60s
-
   api-gateway:
-    depends_on:
-      - mysql
     image: hub.chopinsight.cn/chopinsight/internalimages/api_gateway:latest
     environment:
-      - MYSQL_HOST=mysql
+      - MYSQL_HOST=139.9.132.162
       - MYSQL_PORT=3306
-      - MYSQL_USER=api_gateway
-      - MYSQL_PASSWORD={{API_GATEWAY_MYSQL_PASSWORD}}
+      - MYSQL_USER=kuci_api
+      - MYSQL_PASSWORD=Axx0iQoHbWe3ZTZt
       - MYSQL_DB=chopinsight_api
-      - PROXY_SIGN_SECRET={{PROXY_SIGN_SECRET}}
+      - PROXY_SIGN_SECRET=K9f2Lm8Qx1Rv6Tn3Wp7Hs4Zd0By5CgUa
     networks:
-      - internal
       - proxy_app
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/"]
@@ -70,15 +38,5 @@ services:
         max_attempts: 3
 
 networks:
-  internal:
-    driver: overlay
   proxy_app:
     external: true
-
-volumes:
-  mysql-data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /swarm-vol/gateway/mysql
