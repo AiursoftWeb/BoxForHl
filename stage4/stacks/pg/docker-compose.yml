@@ -223,8 +223,8 @@ services:
       - CLICKHOUSE_USER=default
       - CLICKHOUSE_PASSWORD={{CLICKHOUSE_PASSWORD}}
       - CLICKHOUSE_DB=service_api
-      - ADMIN_PASSWORD={{ADMIN_PASSWORD:-admin123}}
-      - PROXY_SIGN_SECRET={{PROXY_SIGN_SECRET:-K9f2Lm8Qx1Rv6Tn3Wp7Hs4Zd0By5CgUa}}
+      - ADMIN_PASSWORD={{ADMIN_PASSWORD}}
+      - PROXY_SIGN_SECRET={{PROXY_SIGN_SECRET}}
     networks:
       - internal
       - proxy_app
