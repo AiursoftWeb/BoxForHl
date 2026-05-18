@@ -208,6 +208,51 @@ services:
         delay: 10s
         max_attempts: 3
 
+  service-api:
+    image: hub.chopinsight.cn/chopinsight/internalimages/service_api:latest
+    environment:
+      - MYSQL_HOST=139.9.132.162
+      - MYSQL_PORT=3306
+      - MYSQL_USER=db_yuzhong_v2
+      - MYSQL_PASSWORD={{FINDATA_MYSQL_PASSWORD}}
+      - MYSQL_DB=db_yuzhong_v2
+      - DEBUG=false
+      - SERVICE_PORT=8240
+      - CLICKHOUSE_HOST=clickhouse_clickhouse
+      - CLICKHOUSE_PORT=8123
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD={{CLICKHOUSE_PASSWORD}}
+      - CLICKHOUSE_DB=service_api
+      - ADMIN_PASSWORD={{ADMIN_PASSWORD:-admin123}}
+      - PROXY_SIGN_SECRET={{PROXY_SIGN_SECRET:-K9f2Lm8Qx1Rv6Tn3Wp7Hs4Zd0By5CgUa}}
+    networks:
+      - internal
+      - proxy_app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8240/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    stop_grace_period: 20s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+      update_config:
+        order: start-first
+        delay: 5s
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+
   valuation-engine:
     depends_on:
       - postgresql
