@@ -259,7 +259,7 @@ services:
       - MYSQL_HOST=139.9.132.162
       - MYSQL_PORT=3306
       - MYSQL_USER=kuci_api
-      - MYSQL_PASSWORD={{API_GATEWAY_MYSQL_PASSWORD}}
+      - MYSQL_PASSWORD=Axx0iQoHbWe3ZTZt
       - MYSQL_DB=chopinsight_api
     networks:
       - proxy_app
