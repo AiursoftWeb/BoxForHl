@@ -3,11 +3,6 @@ version: '3.9'
 services:
   api-gateway:
     image: hub.chopinsight.cn/chopinsight/internalimages/api_gateway:latest
-    ports:
-      - target: 5000
-        published: 5000
-        protocol: tcp
-        mode: host
     environment:
       - MYSQL_HOST=139.9.132.162
       - MYSQL_PORT=3306
@@ -17,6 +12,7 @@ services:
       - PROXY_SIGN_SECRET=K9f2Lm8Qx1Rv6Tn3Wp7Hs4Zd0By5CgUa
     networks:
       - proxy_app
+      - frp_net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/"]
       interval: 30s
@@ -44,4 +40,6 @@ services:
 
 networks:
   proxy_app:
+    external: true
+  frp_net:
     external: true
