@@ -12,7 +12,6 @@ services:
       - PROXY_SIGN_SECRET=K9f2Lm8Qx1Rv6Tn3Wp7Hs4Zd0By5CgUa
     networks:
       - proxy_app
-      - frp_net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/"]
       interval: 30s
@@ -40,6 +39,4 @@ services:
 
 networks:
   proxy_app:
-    external: true
-  frp_net:
     external: true
