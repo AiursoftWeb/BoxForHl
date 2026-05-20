@@ -3,6 +3,11 @@ version: '3.9'
 services:
   api-gateway:
     image: hub.chopinsight.cn/chopinsight/internalimages/api_gateway:latest
+    ports:
+      - target: 5000
+        published: 5000
+        protocol: tcp
+        mode: host
     environment:
       - MYSQL_HOST=139.9.132.162
       - MYSQL_PORT=3306
