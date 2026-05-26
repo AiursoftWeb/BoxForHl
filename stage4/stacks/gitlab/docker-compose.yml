@@ -157,7 +157,7 @@ services:
       - AgentBot__Engine=Claude
       - AgentBot__Model=aiursoft-super:latest
       - AgentBot__ApiKey={{AGENT_BOT_API_KEY}}
-      - AgentBot__ApiEndpoint=https://ollama.aiursoft.com
+      - AgentBot__ApiEndpoint=https://ollama.chopinsight.cn
       - AgentBot__WorkspaceFolder=/workspace
       - Servers__0__Provider=GitLab
       - Servers__0__EndPoint=https://gitlab.chopinsight.cn

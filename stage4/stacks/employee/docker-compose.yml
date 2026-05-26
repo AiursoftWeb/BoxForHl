@@ -46,7 +46,7 @@ services:
       - employeecenter-context:/import:ro
     environment:
       - ANTHROPIC_API_KEY={{CHOPIN_EMPLOYEE_AGENT_KEY}}
-      - ANTHROPIC_BASE_URL=https://ollama.aiursoft.com
+      - ANTHROPIC_BASE_URL=https://ollama.chopinsight.cn
       - CLAUDE_MODEL=aiursoft-super:latest
       - PROVIDER=claude
     networks:
