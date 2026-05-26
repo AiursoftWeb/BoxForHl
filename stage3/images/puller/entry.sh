@@ -259,6 +259,7 @@ images=(
     "aiursoft/aimer-blog"
     "aiursoft/fissssssh-blog"
     "aiursoft/aiurdrive"
+    "aiursoft/agentbot"
     "aiursoft/apkg"
     "aiursoft/ollamagateway"
     "aiursoft/baget"
