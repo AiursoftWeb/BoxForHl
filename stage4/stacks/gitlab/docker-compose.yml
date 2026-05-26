@@ -164,7 +164,7 @@ services:
       - Servers__0__PushEndPoint=https://{0}@gitlab.chopinsight.cn
       - Servers__0__DisplayName=Agent Bot
       - Servers__0__UserName=claude-code
-      - Servers__0__UserEmail=agent@chopinsight.cn
+      - Servers__0__UserEmail=noreply@anthropic.com
       - Servers__0__ContributionBranch=users/agent/auto-fix-issue
       - Servers__0__Token={{AGENT_BOT_GITLAB_TOKEN}}
     networks:
