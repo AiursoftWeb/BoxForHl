@@ -401,6 +401,7 @@ images=(
     "postgres:14-alpine"
     "postgres:15.2-alpine"
     "postgres:16-alpine"
+    "postgres:16"
     "prom/prometheus"
     "pytorch/pytorch:2.3.0-cuda11.8-cudnn8-devel"
     "pytorch/pytorch:2.7.0-cuda12.6-cudnn9-devel"
