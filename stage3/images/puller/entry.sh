@@ -261,6 +261,7 @@ images=(
     "aiursoft/charter"
     "aiursoft/chessserver"
     "aiursoft/corp-home"
+    "aiursoft/folderagent"
     "aiursoft/cpprunner"
     "aiursoft/employeecenter"
     "aiursoft/gitmirrorserver"
