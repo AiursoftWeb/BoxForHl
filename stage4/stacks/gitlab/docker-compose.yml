@@ -163,7 +163,7 @@ services:
       - Servers__0__EndPoint=https://gitlab.chopinsight.cn
       - Servers__0__PushEndPoint=https://{0}@gitlab.chopinsight.cn
       - Servers__0__DisplayName=Agent Bot
-      - Servers__0__UserName=gemini-bot
+      - Servers__0__UserName=claude-code
       - Servers__0__UserEmail=agent@chopinsight.cn
       - Servers__0__ContributionBranch=users/agent/auto-fix-issue
       - Servers__0__Token={{AGENT_BOT_GITLAB_TOKEN}}
