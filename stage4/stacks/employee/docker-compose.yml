@@ -8,6 +8,7 @@ services:
     volumes:
       - employeecenter-aspnet:/data/.aspnet/
       - employeecenter-files:/data/files
+      - employeecenter-context:/export
     environment:
       - ConnectionStrings__DefaultConnection=Server=db;Database=mth;Uid=mth;Pwd=<mth_password>;
       - ConnectionStrings__DbType=MySql
@@ -16,6 +17,9 @@ services:
       - AppSettings__OIDC__Authority=https://auth.chopinsight.cn/application/o/employeecenter
       - AppSettings__OIDC__ClientId={{EPEC_CLIENT_ID}}
       - AppSettings__OIDC__ClientSecret={{EPEC_CLIENT_SECRET}}
+      - AppSettings__OCR__Enabled=false
+      - AppSettings__ExportPath=/export
+      - AppSettings__Agent__Endpoint=http://agent:8000/ask
       - Logging__Clickhouse__Enabled=true
       - Logging__Clickhouse__ConnectionString=Host=clickhouse;User=default;Password=123456;Database=AspNetCoreLogs
       - Logging__Clickhouse__TableName=EmployeeCenterLogs
@@ -23,6 +27,7 @@ services:
       - proxy_app
       - internal
       - clickhouse_net
+      - agent
     stop_grace_period: 60s
     deploy:
       labels:
@@ -35,8 +40,32 @@ services:
         order: stop-first
         delay: 60s
 
+  agent:
+    image: hub.chopinsight.cn/aiursoft/folderagent:latest
+    volumes:
+      - employeecenter-context:/import:ro
+    environment:
+      - ANTHROPIC_API_KEY={{CHOPIN_EMPLOYEE_AGENT_KEY}}
+      - ANTHROPIC_BASE_URL=https://ollama.aiursoft.com
+      - CLAUDE_MODEL=aiursoft-super:latest
+      - PROVIDER=claude
+    networks:
+      - agent
+    stop_grace_period: 20s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+      update_config:
+        order: start-first
+        delay: 5s
+
   db:
     image: hub.chopinsight.cn/mysql:9.7.0
+    command: --skip-log-bin
     volumes:
       - employeecenter-db:/var/lib/mysql
     environment:
@@ -71,6 +100,12 @@ volumes:
       type: none
       o: bind
       device: /swarm-vol/employeecenter-data/aspnet
+  employeecenter-context:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/employeecenter-data/context
   employeecenter-db:
     driver: local
     driver_opts:
@@ -84,4 +119,6 @@ networks:
   clickhouse_net:
     external: true
   internal:
+    driver: overlay
+  agent:
     driver: overlay
