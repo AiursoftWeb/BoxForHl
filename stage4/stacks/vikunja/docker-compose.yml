@@ -33,7 +33,8 @@ services:
 
   db:
     image: hub.chopinsight.cn/mysql:9.7.0
-    networks: 
+    command: --skip-log-bin
+    networks:
       - internal
     volumes:
       - vikunja-db:/var/lib/mysql

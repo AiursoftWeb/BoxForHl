@@ -37,6 +37,7 @@ services:
 
   db:
     image: hub.chopinsight.cn/mysql:9.7.0
+    command: --skip-log-bin
     volumes:
       - tracer-db:/var/lib/mysql
     environment:
