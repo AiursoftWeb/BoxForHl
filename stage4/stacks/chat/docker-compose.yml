@@ -3,8 +3,54 @@ version: '3.9'
 services:
   app:
     image: hub.chopinsight.cn/chopinsight/internalimages/chopchat:latest
-    env_file:
-      - .env
+    environment:
+      # MySQL
+      - MYSQL_HOST=139.9.132.162
+      - MYSQL_PORT=3306
+      - MYSQL_USER=db_yuzhong_v2
+      - MYSQL_PASSWORD=SfWr24TkQUK4
+      - MYSQL_DATABASE=db_yuzhong_v2
+      - MYSQL_AGENT_USER=readonly_agent
+      - MYSQL_AGENT_PASSWORD=Rc7$mPqX9wLn2Zt
+      # LLM API
+      - DOUBAO_API_KEY=e413fac3-069e-466b-af35-67361b850f4b
+      - DOUBAO_BASE_URL=https://ark.cn-beijing.volces.com/api/v3
+      - DEEPSEEK_API_KEY=sk-a108f676cefc40ed84d150d19a7ba6ed
+      - DEEPSEEK_BASE_URL=https://api.deepseek.com
+      - QWEN_API_KEY=sk-22d676c3a07743ac905df27ac6d1065b
+      - QWEN_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+      - QWEN_OLLAMA_BASE_URL=https://ollama.chopinsight.cn/v1
+      - QWEN_OLLAMA_API_KEY=cb8d88be16a6473f8a3bfcf327419f4d
+      # Embedding
+      - EMBEDDING_API_KEY=e413fac3-069e-466b-af35-67361b850f4b
+      - EMBEDDING_BASE_URL=https://ark.cn-beijing.volces.com/api/v3
+      - EMBEDDING_MODEL=doubao-embedding-vision-251215
+      # ChromaDB
+      - CHROMA_PERSIST_DIR=/data/chroma_db
+      # Tavily
+      - TAVILY_API_KEY=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
+      # 葱花 API
+      - CONGHUA_API_BASE=https://database.chopinsight.cn
+      # MinIO
+      - MINIO_ENDPOINT=oss.chopinsight.cn:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_BUCKET=ppt-images
+      - MINIO_SECURE=false
+      # PostgreSQL (pgvector)
+      - POSTGRES_HOST=110.42.61.186
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=chopinsight
+      - POSTGRES_PASSWORD=GIEF12JK8NG6UE4RI2FLSPQPFK
+      - POSTGRES_DATABASE=chopinsight
+      # 华为云 OBS
+      - OBS_ACCESS_KEY=J0FI96JFVKZZWODYEDDP
+      - OBS_SECRET_KEY=xls01LlsXkiC76oiLo4egSMApwTU0VbFwZopg2KJ
+      - OBS_SERVER=https://obs.cn-north-4.myhuaweicloud.com
+      - OBS_BUCKET=conghua-pics
+    volumes:
+      - chat-data:/data
+      - chat-uploads:/app/uploads
     networks:
       - proxy_app
     healthcheck:
@@ -35,3 +81,17 @@ services:
 networks:
   proxy_app:
     external: true
+
+volumes:
+  chat-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/chat/data
+  chat-uploads:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/chat/uploads
