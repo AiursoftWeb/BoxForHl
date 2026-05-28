@@ -49,8 +49,8 @@ services:
       - OBS_SERVER=https://obs.cn-north-4.myhuaweicloud.com
       - OBS_BUCKET=conghua-pics
     volumes:
-      - chat-data:/data
-      - chat-uploads:/app/uploads
+      - chopchat-data:/data
+      - chopchat-uploads:/app/uploads
     networks:
       - proxy_app
     healthcheck:
@@ -83,15 +83,15 @@ networks:
     external: true
 
 volumes:
-  chat-data:
+  chopchat-data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /swarm-vol/chat/data
-  chat-uploads:
+      device: /swarm-vol/chopchat/data
+  chopchat-uploads:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /swarm-vol/chat/uploads
+      device: /swarm-vol/chopchat/uploads
