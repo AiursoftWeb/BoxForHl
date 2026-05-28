@@ -4,10 +4,47 @@ services:
   chopchat-app:
     image: hub.chopinsight.cn/chopinsight/internalimages/chopchat:latest
     environment:
+      # MySQL (db_yuzhong_v2 — 同 PG 栈 service-api)
       - MYSQL_HOST=139.9.132.162
       - MYSQL_PORT=3306
+      - MYSQL_USER=db_yuzhong_v2
+      - MYSQL_PASSWORD={{FINDATA_MYSQL_PASSWORD}}
+      - MYSQL_DATABASE=db_yuzhong_v2
+      # PostgreSQL (同 PG 栈)
+      - PG_HOST=pg_postgresql
+      - PG_PORT=5432
+      - PG_USER=chopinsight
+      - PG_PASSWORD={{PG_PASSWORD}}
+      - PG_DBNAME=chopinsight
+      # Ollama
+      - QWEN_OLLAMA_BASE_URL=https://ollama.chopinsight.cn/v1
+      - QWEN_OLLAMA_API_KEY={{OLLAMA_API_KEY}}
+      # DeepSeek
+      - DEEPSEEK_BASE_URL=https://api.deepseek.com
+      - DEEPSEEK_API_KEY={{DEEPSEEK_API_KEY}}
+      # 豆包
+      - DOUBAO_BASE_URL=https://ark.cn-beijing.volces.com/api/v3
+      - DOUBAO_API_KEY={{DOUBAO_API_KEY}}
+      # 千问
+      - QWEN_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+      - QWEN_API_KEY={{QWEN_API_KEY}}
+      # MinIO / OBS
+      - MINIO_ENDPOINT=minio
+      - MINIO_ACCESS_KEY={{MINIO_ROOT_USER}}
+      - MINIO_SECRET_KEY={{MINIO_ROOT_PASSWORD}}
+      - MINIO_BUCKET=ppt-images
+      - MINIO_SECURE=false
+      # Embedding
+      - EMBEDDING_ENGINE=ollama
+      # ClickHouse 日志
+      - CLICKHOUSE_HOST=clickhouse_clickhouse
+      - CLICKHOUSE_PORT=8123
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD={{CLICKHOUSE_PASSWORD}}
     networks:
       - proxy_app
+      - internal
+      - clickhouse_net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -35,4 +72,8 @@ services:
 
 networks:
   proxy_app:
+    external: true
+  internal:
+    driver: overlay
+  clickhouse_net:
     external: true
