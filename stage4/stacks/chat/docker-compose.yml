@@ -28,11 +28,10 @@ services:
       # 千问
       - QWEN_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
       - QWEN_API_KEY={{QWEN_API_KEY}}
-      # OBS (华为云对象存储)
-      - OBS_ACCESS_KEY={{OBS_ACCESS_KEY}}
-      - OBS_SECRET_KEY={{OBS_SECRET_KEY}}
-      - OBS_SERVER=https://obs.cn-north-4.myhuaweicloud.com
-      - OBS_BUCKET=conghua-pics
+      # MinIO 对象存储（内网连接，同 PG 栈 findata-engine）
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY={{MINIO_ROOT_USER}}
+      - MINIO_SECRET_KEY={{MINIO_ROOT_PASSWORD}}
       # Embedding
       - EMBEDDING_ENGINE=ollama
     networks:
