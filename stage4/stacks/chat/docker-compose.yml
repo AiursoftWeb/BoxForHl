@@ -35,15 +35,9 @@ services:
       - OBS_BUCKET=conghua-pics
       # Embedding
       - EMBEDDING_ENGINE=ollama
-      # ClickHouse 日志
-      - CLICKHOUSE_HOST=clickhouse_clickhouse
-      - CLICKHOUSE_PORT=8123
-      - CLICKHOUSE_USER=default
-      - CLICKHOUSE_PASSWORD={{CLICKHOUSE_PASSWORD}}
     networks:
       - proxy_app
       - internal
-      - clickhouse_net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -74,5 +68,3 @@ networks:
     external: true
   internal:
     driver: overlay
-  clickhouse_net:
-    external: true
