@@ -43,6 +43,17 @@ services:
       - OCR_BASE64_URL=http://customerocr:8100/api/ocr/base64
       - OCR_PDF_API_URL=http://customerocr:8100/api/ocr/pdf
       - OCR_ACCESS_TOKEN={{OCR_ACCESS_TOKEN}}
+      # 邮件服务（外部 SMTP）
+      - SMTP_HOST=mail.aiursoft.com
+      - SMTP_PORT=465
+      - SMTP_SENDER=service@chopinsight.cn
+      - SMTP_PASSWORD={{SMTP_PASSWORD}}
+      - SMTP_SENDER_NAME=ChopChat 系统通知
+      # IMAP 审批邮件（外部 IMAP）
+      - IMAP_HOST=mail.aiursoft.com
+      - IMAP_USER=service@chopinsight.cn
+      - IMAP_PASSWORD={{IMAP_PASSWORD}}
+      - IMAP_WHITELIST=clare.xu@chopinsight.cn
       # 服务配置
       - DEBUG=false
     networks:
