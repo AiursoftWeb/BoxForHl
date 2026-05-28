@@ -28,12 +28,11 @@ services:
       # 千问
       - QWEN_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
       - QWEN_API_KEY={{QWEN_API_KEY}}
-      # MinIO / OBS
-      - MINIO_ENDPOINT=minio
-      - MINIO_ACCESS_KEY={{MINIO_ROOT_USER}}
-      - MINIO_SECRET_KEY={{MINIO_ROOT_PASSWORD}}
-      - MINIO_BUCKET=ppt-images
-      - MINIO_SECURE=false
+      # OBS (华为云对象存储)
+      - OBS_ACCESS_KEY={{OBS_ACCESS_KEY}}
+      - OBS_SECRET_KEY={{OBS_SECRET_KEY}}
+      - OBS_SERVER=https://obs.cn-north-4.myhuaweicloud.com
+      - OBS_BUCKET=conghua-pics
       # Embedding
       - EMBEDDING_ENGINE=ollama
       # ClickHouse 日志
