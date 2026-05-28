@@ -1,42 +1,53 @@
 version: '3.9'
 
 services:
-  chopchat-app:
+  chat:
     image: hub.chopinsight.cn/chopinsight/internalimages/chopchat:latest
     environment:
-      # MySQL (db_yuzhong_v2 — 同 PG 栈 service-api)
+      # MySQL 鉴权（db_yuzhong_v2，用户/会话管理）
       - MYSQL_HOST=139.9.132.162
       - MYSQL_PORT=3306
       - MYSQL_USER=db_yuzhong_v2
       - MYSQL_PASSWORD={{FINDATA_MYSQL_PASSWORD}}
       - MYSQL_DATABASE=db_yuzhong_v2
-      # PostgreSQL (同 PG 栈)
-      - PG_HOST=pg_postgresql
+      # MySQL 只读 Agent（MCP / RAG 业务查询，仅可访问 chong_* 表）
+      - MYSQL_AGENT_USER=readonly_agent
+      - MYSQL_AGENT_PASSWORD={{MYSQL_AGENT_PASSWORD}}
+      # LLM API（外网服务）
+      - DOUBAO_API_KEY={{DOUBAO_API_KEY}}
+      - DOUBAO_BASE_URL=https://ark.cn-beijing.volces.com/api/v3
+      - DEEPSEEK_API_KEY={{DEEPSEEK_API_KEY}}
+      - DEEPSEEK_BASE_URL=https://api.deepseek.com
+      - QWEN_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+      - QWEN_API_KEY={{QWEN_API_KEY}}
+      # Ollama（统一 AI 服务，走 proxy_app 软路由）
+      - QWEN_OLLAMA_BASE_URL=https://ollama.chopinsight.cn/v1
+      - QWEN_OLLAMA_API_KEY={{OLLAMA_API_KEY}}
+      - OLLAMA_EMBED_MODEL=bge-m3:latest
+      - EMBEDDING_ENGINE=ollama
+      # PostgreSQL（pg stack 内部网络）
+      - PG_HOST=customerpg
       - PG_PORT=5432
       - PG_USER=chopinsight
       - PG_PASSWORD={{PG_PASSWORD}}
       - PG_DBNAME=chopinsight
-      # Ollama
-      - QWEN_OLLAMA_BASE_URL=https://ollama.chopinsight.cn/v1
-      - QWEN_OLLAMA_API_KEY={{OLLAMA_API_KEY}}
-      # DeepSeek
-      - DEEPSEEK_BASE_URL=https://api.deepseek.com
-      - DEEPSEEK_API_KEY={{DEEPSEEK_API_KEY}}
-      # 豆包
-      - DOUBAO_BASE_URL=https://ark.cn-beijing.volces.com/api/v3
-      - DOUBAO_API_KEY={{DOUBAO_API_KEY}}
-      # 千问
-      - QWEN_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
-      - QWEN_API_KEY={{QWEN_API_KEY}}
-      # MinIO 对象存储（内网连接，同 PG 栈 findata-engine）
-      - MINIO_ENDPOINT=minio:9000
+      # MinIO（对象存储，内部网络）
+      - MINIO_ENDPOINT=minio_minio:9000
       - MINIO_ACCESS_KEY={{MINIO_ROOT_USER}}
       - MINIO_SECRET_KEY={{MINIO_ROOT_PASSWORD}}
-      # Embedding
-      - EMBEDDING_ENGINE=ollama
+      - MINIO_BUCKET=chopchat-ppt-images
+      - MINIO_SECURE=false
+      - MINIO_EXTERNAL_URL=https://minio.chopinsight.cn
+      # OCR 服务（内部网络）
+      - OCR_API_URL=http://customerocr:8100/api/ocr
+      - OCR_BASE64_URL=http://customerocr:8100/api/ocr/base64
+      - OCR_PDF_API_URL=http://customerocr:8100/api/ocr/pdf
+      - OCR_ACCESS_TOKEN={{OCR_ACCESS_TOKEN}}
+      # 服务配置
+      - DEBUG=false
     networks:
-      - proxy_app
       - internal
+      - proxy_app
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -45,25 +56,30 @@ services:
       start_period: 60s
     stop_grace_period: 20s
     deploy:
-      labels:
-        shepherd.autoupdate: "true"
-      resources:
-        limits:
-          cpus: '2.0'
-          memory: 2G
-        reservations:
-          cpus: '0.5'
-          memory: 256M
+      mode: replicated
+      replicas: 1
       update_config:
+        parallelism: 1
         order: start-first
         delay: 5s
       restart_policy:
         condition: on-failure
         delay: 10s
         max_attempts: 3
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 8G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+      labels:
+        - "shepherd.autoupdate=true"
 
 networks:
+  internal:
+    external: true
+    name: pg_internal
   proxy_app:
     external: true
-  internal:
-    driver: overlay
+    name: proxy_app
