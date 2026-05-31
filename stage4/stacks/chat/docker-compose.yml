@@ -8,7 +8,7 @@ services:
       - MYSQL_HOST=139.9.132.162
       - MYSQL_PORT=3306
       - MYSQL_USER=db_yuzhong_v2
-      - MYSQL_PASSWORD={{FINDATA_MYSQL_PASSWORD}}
+      - FINDATA_MYSQL_PASSWORD={{FINDATA_MYSQL_PASSWORD}}
       - MYSQL_DATABASE=db_yuzhong_v2
       # MySQL 只读 Agent（MCP / RAG 业务查询，仅可访问 chong_* 表）
       - MYSQL_AGENT_USER=readonly_agent
