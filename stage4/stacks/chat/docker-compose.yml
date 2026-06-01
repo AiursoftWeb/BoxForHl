@@ -26,7 +26,7 @@ services:
       - OLLAMA_EMBED_MODEL=bge-m3:latest
       - EMBEDDING_ENGINE=ollama
       # PostgreSQL（pg stack 内部网络）
-      - PG_HOST=pg_postgresql
+      - PG_HOST=postgresql
       - PG_PORT=5432
       - PG_USER=chopinsight
       - PG_PASSWORD={{PG_PASSWORD}}
@@ -93,6 +93,27 @@ services:
           memory: 1G
       labels:
         - "shepherd.autoupdate=true"
+
+  chopchat-initializer:
+    image: hub.chopinsight.cn/chopinsight/internalimages/chopchat_initializer:latest
+    environment:
+      - PG_HOST=postgresql
+      - PG_PORT=5432
+      - PG_USER=chopinsight
+      - PG_PASSWORD={{PG_PASSWORD}}
+      - PG_DB=chopinsight
+    networks:
+      - internal
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
 
 networks:
   internal:
