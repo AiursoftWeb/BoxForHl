@@ -17,8 +17,13 @@ services:
       - FRP_TOKEN={{FRP_TOKEN}}
       - LANGCHAO_SOURCE_PASSWORD={{LANGCHAO_SOURCE_PASSWORD}}
       - LANGCHAO_DOWNSTREAM_PASSWORD={{LANGCHAO_DOWNSTREAM_PASSWORD}}
+      - CLICKHOUSE_HOST=clickhouse_clickhouse
+      - CLICKHOUSE_PORT=8123
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD={{CLICKHOUSE_PASSWORD}}
     networks:
       - internal
+      - clickhouse_net
     stop_grace_period: 20s
     deploy:
       labels:
@@ -40,6 +45,8 @@ services:
 networks:
   internal:
     driver: overlay
+  clickhouse_net:
+    external: true
 
 volumes:
   cache:
