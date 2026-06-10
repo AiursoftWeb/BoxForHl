@@ -1,0 +1,66 @@
+version: '3.9'
+
+services:
+  app:
+    image: hub.chopinsight.cn/chopinsight/internalimages/sftp_relay:latest
+    volumes:
+      - cache:/chroot/data
+      - host-keys:/etc/ssh
+    environment:
+      - SOURCE_HOST=182.151.45.185
+      - SOURCE_PORT=4022
+      - SOURCE_USER=chdata20260601
+      - SOURCE_ROOT=/
+      - DOWNSTREAM_IP=222.73.29.120
+      - TTL_DAYS=3
+      - FRP_SERVER={{FRP_SERVER}}
+      - FRP_TOKEN={{FRP_TOKEN}}
+    networks:
+      - internal
+      - frp_net
+    secrets:
+      - LANGCHAO_SOURCE_PASSWORD
+      - LANGCHAO_DOWNSTREAM_PASSWORD
+    stop_grace_period: 20s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+      update_config:
+        order: start-first
+        delay: 5s
+      restart_policy:
+        condition: any
+        delay: 10s
+
+networks:
+  internal:
+    driver: overlay
+  frp_net:
+    external: true
+
+volumes:
+  cache:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/sftp-relay/cache
+  host-keys:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/sftp-relay/host-keys
+
+secrets:
+  LANGCHAO_SOURCE_PASSWORD:
+    external: true
+  LANGCHAO_DOWNSTREAM_PASSWORD:
+    external: true
