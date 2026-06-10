@@ -49,8 +49,15 @@ networks:
     external: true
 
 volumes:
-  # Docker-managed 卷（data-root=/swarm-vol/docker-data，实际数据仍在 /swarm-vol 下）
-  # 不用 bind mount 是因为 deploy.sh:407 的 mkdir 块包在 stage-0 if 里，
-  # 用户跑 --stage 4 时会跳过 → 目录不存在 → 容器死循环挂载失败。
   cache:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/sftp-relay/cache
   host-keys:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/sftp-relay/host-keys
