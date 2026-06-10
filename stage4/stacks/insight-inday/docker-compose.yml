@@ -1,0 +1,83 @@
+version: '3.9'
+
+services:
+  insight-inday:
+    image: hub.chopinsight.cn/chopinsight/emeicang_services/insight_inday:latest
+    environment:
+      # Tushare
+      - TUSHARE_TOKEN={{TUSHARE_TOKEN}}
+      # ClickHouse（Chopart 本地，跟 Level2ETL 共用同一 CH 实例）
+      - CH_HOST=clickhouse
+      - CH_PORT=8123
+      - CH_USER=default
+      - CH_PASSWORD={{CLICKHOUSE_PASSWORD}}
+      - CH_DATABASE=insight
+      # 华为云 MySQL（Phase 1 verifier 读对比；Phase 2 启用双写）
+      - MYSQL_HOST=139.9.132.162
+      - MYSQL_PORT=3306
+      - MYSQL_USER=db_yuzhong_v2
+      - MYSQL_PASSWORD={{MYSQL_PASSWORD}}
+      - MYSQL_DATABASE=db_yuzhong_v2
+      # 飞书告警（Phase 1 数据一致性告警）
+      - FEISHU_WEBHOOK={{FEISHU_WEBHOOK_INSIGHT}}
+    networks:
+      - clickhouse_net
+      - proxy_app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    stop_grace_period: 15s
+    depends_on:
+      - insight-inday-initializer
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        order: start-first
+        delay: 5s
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+      labels:
+        - "shepherd.autoupdate=true"
+
+  insight-inday-initializer:
+    image: hub.chopinsight.cn/chopinsight/emeicang_services/insight_inday_initializer:latest
+    environment:
+      - CH_HOST=clickhouse
+      - CH_PORT=8123
+      - CH_USER=default
+      - CH_PASSWORD={{CLICKHOUSE_PASSWORD}}
+      - CH_DATABASE=insight
+    networks:
+      - clickhouse_net
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
+
+networks:
+  clickhouse_net:
+    external: true
+    name: clickhouse_net
+  proxy_app:
+    external: true
+    name: proxy_app
