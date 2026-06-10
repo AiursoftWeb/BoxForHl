@@ -18,8 +18,8 @@ services:
       - MYSQL_USER=db_yuzhong_v2
       - MYSQL_PASSWORD={{MYSQL_PASSWORD}}
       - MYSQL_DATABASE=db_yuzhong_v2
-      # 飞书告警（Phase 1 数据一致性告警）— 硬编码，复用现有机器人
-      - FEISHU_WEBHOOK=https://open.feishu.cn/open-apis/bot/v2/hook/55616626-b97d-43a5-91c1-e26d2f41dfe1
+      # 飞书告警（Phase 1 数据一致性告警）— 复用 .env 里的 FEISHU_WEBHOOK
+      - FEISHU_WEBHOOK={{FEISHU_WEBHOOK}}
     networks:
       - clickhouse_net
       - proxy_app
