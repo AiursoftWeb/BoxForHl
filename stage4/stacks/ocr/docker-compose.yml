@@ -28,8 +28,8 @@ services:
           cpus: '4.0'
           memory: 12G
       update_config:
-        order: start-first
-        delay: 5s
+        order: stop-first
+        delay: 10s
 
   customer_ocr:
     image: hub.chopinsight.cn/chopinsight/internalimages/customer_ocr:latest
@@ -61,8 +61,8 @@ services:
           cpus: '4.0'
           memory: 12G
       update_config:
-        order: start-first
-        delay: 5s
+        order: stop-first
+        delay: 10s
       restart_policy:
         condition: any
         delay: 5s
