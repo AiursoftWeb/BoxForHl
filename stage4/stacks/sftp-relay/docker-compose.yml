@@ -7,7 +7,10 @@ services:
       - cache:/chroot/data
       - host-keys:/etc/ssh
     environment:
-      - SOURCE_HOST=182.151.45.185
+      # 容器走 chopart NAT 出去源 IP=31.56（办公室），不在上游白名单里。
+      # 110.42.61.186 上跑 socat 把 4022 转发到真正的 182.151.45.185:4022，
+      # 上游看到的源 IP 就是 110.42（已在白名单）。
+      - SOURCE_HOST=110.42.61.186
       - SOURCE_PORT=4022
       - SOURCE_USER=chdata20260601
       - SOURCE_ROOT=/
