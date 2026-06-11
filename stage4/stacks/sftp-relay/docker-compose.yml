@@ -7,9 +7,9 @@ services:
       - cache:/chroot/data
       - host-keys:/etc/ssh
     environment:
-      # 上游已经把 chopart NAT 出口 31.56.26.168 加进白名单，
-      # 容器直接连上游，不经 110.42 中转。
-      - SOURCE_HOST=182.151.45.185
+      # Box 迁海外，上游白名单只认 110.42.61.186；
+      # 110 上 systemd socat-sftp-relay 把 :4022 透传到 182.151.45.185:4022。
+      - SOURCE_HOST=110.42.61.186
       - SOURCE_PORT=4022
       - SOURCE_USER=chdata20260601
       - SOURCE_ROOT=/
