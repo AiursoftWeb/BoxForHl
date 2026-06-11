@@ -13,7 +13,7 @@ services:
       - SOURCE_PORT=4022
       - SOURCE_USER=chdata20260601
       - SOURCE_ROOT=/
-      - DOWNSTREAM_IP=222.73.29.120
+      - DOWNSTREAM_IP=222.73.29.113
       - TTL_DAYS=3
       - FRP_SERVER={{FRP_SERVER}}
       - FRP_TOKEN={{FRP_TOKEN}}
