@@ -53,3 +53,13 @@ localPort = 5432
 remotePort = 5432
 transport.useCompression = true
 transport.bandwidthLimit = "3MB"
+
+# SFTP Relay — 下游 langchao 从公网 14022 连进来取数据
+[[proxies]]
+name = "sftp_relay_langchao"
+type = "tcp"
+localIP = "sftp-relay_app"
+localPort = 22
+remotePort = 14022
+transport.useCompression = true
+transport.bandwidthLimit = "10MB"
