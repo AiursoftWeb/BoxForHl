@@ -274,6 +274,8 @@ services:
       - OLLAMA_GATEWAY_URL=https://ollama.chopinsight.cn
       - OLLAMA_CHAT_MODEL=aiursoft-instruct:latest
       - OLLAMA_API_KEY={{OLLAMA_API_KEY}}
+      # ExtractionEngine（同 stack 内直接用服务名）
+      - EXTRACTION_ENGINE_URL=http://pg_extraction-engine:8205
       # 服务配置
       - DEBUG=false
       - SCAN_INTERVAL_MINUTES=60
