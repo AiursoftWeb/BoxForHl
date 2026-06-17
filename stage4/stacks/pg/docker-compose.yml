@@ -126,6 +126,7 @@ services:
       - internal
       - proxy_app
       - clickhouse_net
+      - pg_internal
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8200/health || exit 1"]
       start_period: 300s
