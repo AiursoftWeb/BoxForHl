@@ -363,7 +363,7 @@ networks:
   internal:
     driver: overlay
   pg_net:
-    driver: overlay
+    external: true
   proxy_app:
     external: true
   clickhouse_net:
