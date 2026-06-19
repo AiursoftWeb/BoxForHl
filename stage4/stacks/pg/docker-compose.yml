@@ -12,6 +12,7 @@ services:
     networks:
       - frp_net
       - internal
+      - pg_net
     ports:
       # These ports are for internal use. For external, FRP will handle it.
       # PostgreSQL default port
@@ -126,7 +127,6 @@ services:
       - internal
       - proxy_app
       - clickhouse_net
-      - pg_internal
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8200/health || exit 1"]
       start_period: 300s
@@ -361,6 +361,8 @@ networks:
   frp_net:
     external: true
   internal:
+    driver: overlay
+  pg_net:
     driver: overlay
   proxy_app:
     external: true

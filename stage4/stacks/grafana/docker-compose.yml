@@ -14,7 +14,7 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
     networks:
       - proxy_app
-      - pg_internal
+      - pg_net
     stop_grace_period: 30s
     deploy:
       labels:
@@ -71,7 +71,7 @@ services:
 networks:
   proxy_app:
     external: true
-  pg_internal:
+  pg_net:
     external: true
 
 volumes:
