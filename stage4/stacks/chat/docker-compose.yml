@@ -63,7 +63,7 @@ services:
       - CLICKHOUSE_PASSWORD={{CLICKHOUSE_PASSWORD}}
       - CLICKHOUSE_DB=chopchat
     networks:
-      - internal
+      - pg_internal
       - proxy_app
       - clickhouse_net
     healthcheck:
@@ -103,7 +103,7 @@ services:
       - PG_PASSWORD={{PG_PASSWORD}}
       - PG_DB=chopinsight
     networks:
-      - internal
+      - pg_internal
     deploy:
       mode: replicated
       replicas: 1
@@ -116,12 +116,9 @@ services:
           memory: 256M
 
 networks:
-  internal:
-    external: true
-    name: pg_internal
   proxy_app:
     external: true
-    name: proxy_app
+  pg_internal:
+    external: true
   clickhouse_net:
     external: true
-    name: clickhouse_net
