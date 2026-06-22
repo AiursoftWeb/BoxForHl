@@ -7,15 +7,14 @@ services:
       - cache:/chroot/data
       - host-keys:/etc/ssh
     environment:
-      # Box 迁海外，上游白名单只认 110.42.61.186；
-      # 110 上 systemd socat-sftp-relay 把 :4022 透传到 182.151.45.185:4022。
-      - SOURCE_HOST=110.42.61.186
+      # 123.249.33.160 替代退役的 110.42.61.186（frps + socat:4022 转上游）
+      - SOURCE_HOST=123.249.33.160
       - SOURCE_PORT=4022
       - SOURCE_USER=chdata20260601
       - SOURCE_ROOT=/
       - DOWNSTREAM_IP=222.73.29.113
       - TTL_DAYS=3
-      - FRP_SERVER={{FRP_SERVER}}
+      - SFTP_FRP_SERVER={{SFTP_FRP_SERVER}}
       - FRP_TOKEN={{FRP_TOKEN}}
       - LANGCHAO_SOURCE_PASSWORD={{LANGCHAO_SOURCE_PASSWORD}}
       - LANGCHAO_DOWNSTREAM_PASSWORD={{LANGCHAO_DOWNSTREAM_PASSWORD}}
