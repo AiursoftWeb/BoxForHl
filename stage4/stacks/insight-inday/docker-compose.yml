@@ -21,8 +21,8 @@ services:
       # 飞书告警（Phase 1 数据一致性告警）— 复用 .env 里的 FEISHU_WEBHOOK
       - FEISHU_WEBHOOK={{FEISHU_WEBHOOK}}
     networks:
+      - internal
       - clickhouse_net
-      - proxy_app
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 30s
@@ -75,9 +75,8 @@ services:
           memory: 128M
 
 networks:
+  internal:
+    driver: overlay
   clickhouse_net:
     external: true
     name: clickhouse_net
-  proxy_app:
-    external: true
-    name: proxy_app
