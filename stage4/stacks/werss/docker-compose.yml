@@ -25,6 +25,33 @@ services:
         order: stop-first
         delay: 60s
 
+  chat:
+    image: hub.chopinsight.cn/python:3.11
+    volumes:
+      - /swarm-vol/boxforchopart/stage4/stacks/werss/chat:/app:ro
+    environment:
+      - DEEPSEEK_API_KEY={{DEEPSEEK_API_KEY}}
+    networks:
+      - proxy_app
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8100/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    command: ["sh", "-c", "pip install -r /app/requirements.txt -q && exec uvicorn app:app --host 0.0.0.0 --port 8100"]
+    stop_grace_period: 20s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+      update_config:
+        order: start-first
+        delay: 5s
+
 networks:
   proxy_app:
     external: true
