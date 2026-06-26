@@ -408,6 +408,7 @@ images=(
     "python:3.10"
     "python:3.11"
     "qdrant/qdrant"
+    "rachelos/we-mp-rss"
     "rabbitmq"
     "redis"
     "redis:7-alpine"
