@@ -33,6 +33,3 @@ mirror_image "ghcr.io/goauthentik/server:2026.2.1"
 
 echo "Mirroring Vikunja..."
 mirror_image "vikunja/vikunja"
-
-echo "Mirroring we-mp-rss..."
-mirror_image "rachelos/we-mp-rss:latest"
