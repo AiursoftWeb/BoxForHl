@@ -39,7 +39,7 @@ services:
   findata-initializer:
     depends_on:
       - postgresql
-    image: hub.chopinsight.cn/chopinsight/internalimages/findata_initializer:latest
+    image: hub.chopinsight.cn/chopinsight/emeicang_services/findata_initializer:latest
     environment:
       - PG_HOST=postgresql
       - PG_PORT=5432
@@ -68,7 +68,7 @@ services:
   findata-engine:
     depends_on:
       - postgresql
-    image: hub.chopinsight.cn/chopinsight/internalimages/findata_engine:latest
+    image: hub.chopinsight.cn/chopinsight/emeicang_services/findata_engine:latest
     volumes:
       - findata-pdfs:/tmp/findata_pdfs
     # Note: 1000+ page PDFs need >4G memory for text extraction
