@@ -80,6 +80,8 @@ services:
 
     environment:
       SFTP_PASSWORD: "0zRCQCPgPk48R8jy0jv5rdfAjaSHu9NS-a2Dgt9QJ-A="
+      # 压缩后暂停（改 0 恢复自动导入 hist2/hist1）
+      LEVEL2_COMPRESS_ONLY: "1"
       CLICKHOUSE_HOST: clickhouse
       CLICKHOUSE_PORT: "8124"
       CLICKHOUSE_USER: default
