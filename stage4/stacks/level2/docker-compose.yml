@@ -84,6 +84,12 @@ services:
       CLICKHOUSE_PORT: "8124"
       CLICKHOUSE_USER: default
       CLICKHOUSE_PASSWORD: "123456"
+      # 中心 CH（Grafana 可读）第二路日志 → level2.app_log，用于外部监控
+      LOG_CLICKHOUSE_HOST: clickhouse_clickhouse
+      LOG_CLICKHOUSE_PORT: "8123"
+      LOG_CLICKHOUSE_USER: default
+      LOG_CLICKHOUSE_PASSWORD: "{{CLICKHOUSE_PASSWORD}}"
+      LOG_CLICKHOUSE_DB: level2
 
     networks:
       - internal
