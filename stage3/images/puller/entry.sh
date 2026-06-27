@@ -407,6 +407,7 @@ images=(
     "pytorch/pytorch:2.7.0-cuda12.6-cudnn9-devel"
     "python:3.10"
     "python:3.11"
+    "python:3.11-slim"
     "qdrant/qdrant"
     "rachelos/we-mp-rss"
     "rabbitmq"
