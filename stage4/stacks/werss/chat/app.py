@@ -1,16 +1,92 @@
-import os, json, logging
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, StreamingResponse
+import os, re, json, time, secrets, logging
+from fastapi import FastAPI, Request, Form
+from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse, RedirectResponse
 import httpx
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("chat")
 app = FastAPI()
 
-WERSS_BASE = "http://werss_server:8001"
+WERSS_BASE = os.environ.get("WERSS_BASE", "http://werss_server:8001")
 DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions"
+COOKIE = "werss_chat_sid"
 
-HTML = r"""<!DOCTYPE html>
+# Login reuses the werss account: the user signs in with their werss credentials,
+# we validate against werss's own login API and keep their JWT in a server-side
+# session. That same JWT is then used to fetch articles — no static password here.
+# Single-user tool, so an in-memory session store is fine (re-login after restart).
+SESSIONS = {}  # sid -> {"token": jwt, "expires": epoch}
+
+
+def _session(request: Request):
+    sid = request.cookies.get(COOKIE)
+    s = SESSIONS.get(sid) if sid else None
+    if s and s["expires"] > time.time():
+        return sid, s
+    if sid in SESSIONS:
+        SESSIONS.pop(sid, None)
+    return None, None
+
+
+def _list(payload):
+    """Unwrap the werss `{code, message, data: {list: [...]}}` envelope."""
+    if isinstance(payload, dict):
+        data = payload.get("data", payload)
+        if isinstance(data, dict):
+            return data.get("list", [])
+        if isinstance(data, list):
+            return data
+    if isinstance(payload, list):
+        return payload
+    return []
+
+
+def _strip_html(s: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", s or "")).strip()
+
+
+LOGIN_HTML = r"""<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WeRSS Chat 登录</title>
+<style>
+:root{--bg:#0f0f0f;--surface:#1a1a1a;--border:#2a2a2a;--text:#e0e0e0;--muted:#888;--accent:#4ade80}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;align-items:center;justify-content:center}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:32px;width:320px;display:flex;flex-direction:column;gap:14px}
+.card h1{font-size:18px;text-align:center}
+.card .sub{font-size:12px;color:var(--muted);text-align:center;margin-top:-6px}
+.card input{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px;outline:none}
+.card input:focus{border-color:var(--accent)}
+.card button{background:var(--accent);color:#000;border:none;border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer}
+.card button:disabled{opacity:.5}
+#err{color:#fca5a5;font-size:12px;text-align:center;min-height:14px}
+</style></head><body>
+<form class="card" onsubmit="return doLogin(event)">
+  <h1>&#x1F4E1; WeRSS Chat</h1>
+  <div class="sub">使用你的 WeRSS 账号登录</div>
+  <input id="u" placeholder="用户名" autocomplete="username" autofocus>
+  <input id="p" type="password" placeholder="密码" autocomplete="current-password">
+  <button id="b" type="submit">登录</button>
+  <div id="err"></div>
+</form>
+<script>
+async function doLogin(e){
+  e.preventDefault();
+  const b=document.getElementById('b'),err=document.getElementById('err');
+  b.disabled=true;err.textContent='';
+  const body=new URLSearchParams({username:u.value.trim(),password:p.value});
+  try{
+    const r=await fetch('/chat/login',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
+    if(r.ok){location.href='/chat';}
+    else{const t=await r.json().catch(()=>({detail:'登录失败'}));err.textContent=t.detail||'用户名或密码错误';b.disabled=false;}
+  }catch(ex){err.textContent='连接失败: '+ex.message;b.disabled=false;}
+  return false;
+}
+</script></body></html>"""
+
+
+CHAT_HTML = r"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -22,11 +98,8 @@ HTML = r"""<!DOCTYPE html>
 body{font-family:-apple-system,'SF Pro Display','Segoe UI',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column}
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:12px}
 header h1{font-size:16px;font-weight:600}
-header input{flex:1;max-width:480px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none}
-header input:focus{border-color:var(--accent)}
-header button{background:var(--accent);color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer}
-header button:hover{background:var(--accent-hover)}
-#status{font-size:12px;color:var(--muted)}
+#status{font-size:12px;color:var(--muted);margin-left:auto}
+#logout{font-size:12px;color:var(--muted);cursor:pointer;border:1px solid var(--border);border-radius:6px;padding:4px 10px;background:var(--bg)}
 main{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
 .msg{padding:12px 16px;border-radius:12px;max-width:85%;line-height:1.6;font-size:14px;white-space:pre-wrap;word-break:break-word}
 .msg.user{align-self:flex-end;background:var(--accent);color:#000}
@@ -40,18 +113,13 @@ footer input:focus{border-color:var(--accent)}
 footer button{background:var(--accent);color:#000;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
 footer button:hover{background:var(--accent-hover)}
 footer button:disabled{opacity:.5;cursor:not-allowed}
-@keyframes blink{50%{opacity:.3}}
-.streaming .dot{animation:blink 1s infinite}
-.streaming .dot:nth-child(2){animation-delay:.2s}
-.streaming .dot:nth-child(3){animation-delay:.4s}
 </style>
 </head>
 <body>
 <header>
   <h1>&#x1F4E1; WeRSS Chat</h1>
-  <input id="key" type="password" placeholder="输入 WeRSS Access Key" autocomplete="off">
-  <button onclick="saveKey()">保存</button>
-  <span id="status"></span>
+  <span id="status">基于已订阅公众号的最新文章问答</span>
+  <button id="logout" onclick="logout()">退出</button>
 </header>
 <main id="chat"></main>
 <footer>
@@ -59,16 +127,10 @@ footer button:disabled{opacity:.5;cursor:not-allowed}
   <button id="askBtn" onclick="ask()">发送</button>
 </footer>
 <script>
-const chat=document.getElementById('chat'),keyEl=document.getElementById('key'),
-      questionEl=document.getElementById('question'),askBtn=document.getElementById('askBtn'),
-      statusEl=document.getElementById('status');
-let accessKey=localStorage.getItem('werss_access_key')||'';
-keyEl.value=accessKey;
-if(accessKey)statusEl.textContent='✔ Key 已保存';
-else statusEl.textContent='⚠ 请先输入 Key';
+const chat=document.getElementById('chat'),questionEl=document.getElementById('question'),
+      askBtn=document.getElementById('askBtn');
 
-function saveKey(){accessKey=keyEl.value.trim();localStorage.setItem('werss_access_key',accessKey);
-  statusEl.textContent=accessKey?'✔ Key 已保存':'⚠ 请先输入 Key';}
+async function logout(){await fetch('/chat/logout',{method:'POST'});location.href='/chat';}
 
 function addMsg(role,text,isError){
   const d=document.createElement('div');d.className='msg '+role+(isError?' error':'');
@@ -78,13 +140,14 @@ function addMsg(role,text,isError){
   chat.scrollTop=chat.scrollHeight;return d;}
 
 async function ask(){
-  const q=questionEl.value.trim();if(!q)return;if(!accessKey){alert('请先输入并保存 Access Key');return;}
+  const q=questionEl.value.trim();if(!q)return;
   questionEl.value='';askBtn.disabled=true;
   addMsg('user',q);
-  const div=addMsg('assistant','','','');
+  const div=addMsg('assistant','');
   try{
     const resp=await fetch('/chat/ask',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({question:q,access_key:accessKey})});
+      body:JSON.stringify({question:q})});
+    if(resp.status===401){location.href='/chat';return;}
     if(!resp.ok){const t=await resp.text();div.classList.add('error');div.childNodes[1].textContent='请求失败: '+t;askBtn.disabled=false;return;}
     const reader=resp.body.getReader(),decoder=new TextDecoder();
     let buffer='',text='';
@@ -96,7 +159,9 @@ async function ask(){
         if(!line.startsWith('data: '))continue;
         const data=line.slice(6);
         if(data==='[DONE]')continue;
-        try{const j=JSON.parse(data);const c=j.choices?.[0]?.delta?.content||'';text+=c;}
+        try{const j=JSON.parse(data);
+          if(j.error){div.classList.add('error');text+='\n[错误] '+j.error;continue;}
+          const c=j.choices?.[0]?.delta?.content||'';text+=c;}
         catch(e){continue;}
       }
       div.childNodes[1].textContent=text;chat.scrollTop=chat.scrollHeight;
@@ -108,74 +173,99 @@ async function ask(){
 
 
 @app.get("/chat", response_class=HTMLResponse)
-async def chat_page():
-    return HTML
+async def chat_page(request: Request):
+    _, s = _session(request)
+    return CHAT_HTML if s else LOGIN_HTML
+
+
+@app.post("/chat/login")
+async def login(username: str = Form(...), password: str = Form(...)):
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        try:
+            resp = await client.post(
+                f"{WERSS_BASE}/api/v1/wx/auth/login",
+                data={"username": username, "password": password},
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
+            )
+        except Exception as e:
+            return JSONResponse({"detail": f"无法连接 WeRSS: {e}"}, status_code=502)
+    if resp.status_code != 200:
+        return JSONResponse({"detail": "用户名或密码错误"}, status_code=401)
+    data = resp.json()["data"]
+    sid = secrets.token_urlsafe(32)
+    SESSIONS[sid] = {
+        "token": data["access_token"],
+        "expires": time.time() + float(data.get("expires_in", 86400)),
+    }
+    out = JSONResponse({"ok": True})
+    out.set_cookie(COOKIE, sid, max_age=86400 * 7, httponly=True, samesite="lax", path="/chat")
+    return out
+
+
+@app.post("/chat/logout")
+async def logout(request: Request):
+    sid, _ = _session(request)
+    if sid:
+        SESSIONS.pop(sid, None)
+    out = JSONResponse({"ok": True})
+    out.delete_cookie(COOKIE, path="/chat")
+    return out
+
+
+async def _build_context(client: httpx.AsyncClient, token: str) -> str:
+    """Fetch recent subscribed articles and build a grounding context string."""
+    headers = {"Authorization": f"Bearer {token}"}
+    art_resp = await client.get(
+        f"{WERSS_BASE}/api/v1/wx/articles",
+        headers=headers,
+        params={"limit": 15, "offset": 0},
+    )
+    art_resp.raise_for_status()
+    articles = _list(art_resp.json())
+
+    parts = []
+    for i, a in enumerate(articles[:15]):
+        if not isinstance(a, dict):
+            continue
+        title = a.get("title", "无标题")
+        mp = a.get("mp_name", "")
+        body = _strip_html(a.get("description", ""))
+        # Enrich the first few with full article content (list view has no content).
+        if i < 6 and a.get("id"):
+            try:
+                full = await client.get(
+                    f"{WERSS_BASE}/api/v1/wx/articles/{a['id']}", headers=headers
+                )
+                full.raise_for_status()
+                fd = full.json().get("data", {})
+                content = _strip_html(fd.get("content", "")) if isinstance(fd, dict) else ""
+                if content:
+                    body = content[:1500]
+            except Exception as e:
+                log.warning(f"full content fetch failed for {a.get('id')}: {e}")
+        parts.append(f"【{title}】（{mp}）\n{body[:1500]}")
+
+    return "\n\n---\n\n".join(parts)
 
 
 @app.post("/chat/ask")
 async def ask(request: Request):
+    _, s = _session(request)
+    if not s:
+        return JSONResponse({"detail": "未登录"}, status_code=401)
+
     data = await request.json()
     question = data["question"]
-    access_key = data["access_key"]
-
-    headers = {"Authorization": f"Bearer {access_key}"}
-    articles = []
 
     async with httpx.AsyncClient(timeout=30.0) as client:
-        # 1. get subscriptions
         try:
-            subs_resp = await client.get(f"{WERSS_BASE}/api/v1/subscriptions", headers=headers)
-            subs_resp.raise_for_status()
-            subs = subs_resp.json()
-            mp_list = subs if isinstance(subs, list) else subs.get("items", subs.get("data", []))
-            if isinstance(mp_list, dict):
-                mp_list = list(mp_list.values())
+            context = await _build_context(client, s["token"])
         except Exception as e:
-            log.warning(f"Failed to get subscriptions: {e}")
-            mp_list = []
-
-        if not mp_list:
-            # Try direct article list without filtering
-            try:
-                art_resp = await client.get(f"{WERSS_BASE}/api/v1/articles", headers=headers, params={"limit": 20})
-                art_resp.raise_for_status()
-                data = art_resp.json()
-                articles = data if isinstance(data, list) else data.get("items", data.get("data", []))
-                if isinstance(articles, dict):
-                    articles = list(articles.values())
-            except Exception as e:
-                log.warning(f"Failed to get articles: {e}")
-
-        # 2. get articles from each subscription (up to 3 subs)
-        for sub in mp_list[:3]:
-            mp_name = sub.get("mp_name", sub.get("name", "")) if isinstance(sub, dict) else str(sub)
-            try:
-                art_resp = await client.get(
-                    f"{WERSS_BASE}/api/v1/articles",
-                    headers=headers,
-                    params={"mp_name": mp_name, "limit": 5}
-                )
-                art_resp.raise_for_status()
-                data = art_resp.json()
-                items = data if isinstance(data, list) else data.get("items", data.get("data", []))
-                if isinstance(items, dict):
-                    items = list(items.values())
-                articles.extend(items)
-            except Exception as e:
-                log.warning(f"Failed to get articles for {mp_name}: {e}")
-
-    # Build context
-    context_parts = []
-    for a in articles[:15]:
-        title = a.get("title", a.get("name", "无标题")) if isinstance(a, dict) else str(a)
-        content = ""
-        if isinstance(a, dict):
-            content = a.get("content", a.get("summary", a.get("description", "")))
-        context_parts.append(f"【{title}】\n{content[:1000]}")
-    context = "\n\n---\n\n".join(context_parts)
+            log.warning(f"Failed to build context: {e}")
+            context = ""
 
     if not context:
-        context = "未找到相关文章。请确认已订阅公众号且Access Key有效。"
+        context = "未找到相关文章。请确认 WeRSS 已订阅公众号且已抓取到文章。"
 
     async def generate():
         async with httpx.AsyncClient(timeout=120.0) as client:
