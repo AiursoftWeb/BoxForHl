@@ -31,6 +31,9 @@ services:
       - PG_USER=chopinsight
       - PG_PASSWORD={{PG_PASSWORD}}
       - PG_DBNAME=chopinsight
+      # 聊天历史迁移过渡：dual=写 MySQL+PG / 读 PG；首启回填 MySQL→PG（幂等，回填稳定后可关）
+      - CHAT_STORE=dual
+      - CHAT_BACKFILL_ON_START=true
       # MinIO（对象存储，内部网络）
       - MINIO_ENDPOINT=minio_minio:9000
       - MINIO_ACCESS_KEY={{MINIO_ROOT_USER}}
@@ -71,7 +74,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
+      start_period: 120s          # 首启含一次性聊天历史回填，放宽就绪窗口
     stop_grace_period: 20s
     deploy:
       mode: replicated
