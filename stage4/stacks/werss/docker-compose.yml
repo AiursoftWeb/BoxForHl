@@ -26,9 +26,7 @@ services:
         delay: 60s
 
   chat:
-    image: hub.chopinsight.cn/python:3.11
-    volumes:
-      - /swarm-vol/boxforchopart/stage4/stacks/werss/chat:/app:ro
+    image: hub.chopinsight.cn/chopinsight/internalimages/werss_chat:latest
     environment:
       - DEEPSEEK_API_KEY={{DEEPSEEK_API_KEY}}
     networks:
@@ -39,7 +37,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    command: ["sh", "-c", "cd /app && python3 -m pip install -r requirements.txt -q -i https://pypi.tuna.tsinghua.edu.cn/simple && exec python3 -m uvicorn app:app --host 0.0.0.0 --port 8100"]
     stop_grace_period: 20s
     deploy:
       labels:
