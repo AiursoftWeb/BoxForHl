@@ -13,7 +13,7 @@ services:
       MYSQL_HOST: 139.9.132.162
       MYSQL_PORT: 3306
       MYSQL_USER: db_yuzhong_v2
-      MYSQL_PASSWORD: "{{MYSQL_PASSWORD}}"
+      MYSQL_PASSWORD: "{{FINDATA_MYSQL_PASSWORD}}"
       MYSQL_DB: db_yuzhong_v2
 
       # PostgreSQL（chopinsight 主库）
@@ -30,24 +30,18 @@ services:
       CLICKHOUSE_PASSWORD: "{{CLICKHOUSE_PASSWORD}}"
       CLICKHOUSE_DB: main_factory
 
-      # 飞书通知
-      FEISHU_WEBHOOK: "{{FEISHU_WEBHOOK}}"
+      # 飞书通知（可选，未配置 secret 时留空）
+      FEISHU_WEBHOOK: ""
 
       # LLM API Keys
       ZHIPU_API_KEY: "{{ZHIPU_API_KEY}}"
       DEEPSEEK_API_KEY: "{{DEEPSEEK_API_KEY}}"
       DEEPSEEK_BASE_URL: https://api.deepseek.com
-      VOLC_ARK_API_KEY: "{{VOLC_ARK_API_KEY}}"
+      VOLC_ARK_API_KEY: "{{DOUBAO_API_KEY}}"
 
-      # MinerU / OCR
-      MINERU_TOKEN: "{{MINERU_TOKEN}}"
+      # OCR（自有 OCR 服务，已替代 MinerU）
       CUSTOMER_OCR_BASE_URL: https://customer-ocr.chopinsight.cn
-      CUSTOMER_OCR_TOKEN: "{{CUSTOMER_OCR_TOKEN}}"
-
-      # 华为云 OBS
-      HUAWEI_OSS_SERVICE_URL: "{{HUAWEI_OSS_SERVICE_URL}}"
-      HUAWEI_OSS_ACCESS_KEY: "{{HUAWEI_OSS_ACCESS_KEY}}"
-      HUAWEI_OSS_SECRET_ACCESS_KEY: "{{HUAWEI_OSS_SECRET_ACCESS_KEY}}"
+      CUSTOMER_OCR_TOKEN: "{{OCR_ACCESS_TOKEN}}"
 
       # 文件路径
       PDF_DIR: /tmp/pdf/
