@@ -4,7 +4,7 @@ services:
   app:
     depends_on:
       - db
-    image: hub.chopinsight.cn/aiursoft/employeecenter:latest
+    image: hub.hlwuxi.com/aiursoft/employeecenter:latest
     volumes:
       - employeecenter-aspnet:/data/.aspnet/
       - employeecenter-files:/data/files
@@ -14,7 +14,7 @@ services:
       - ConnectionStrings__DbType=MySql
       - Storage__Path=/data/files
       - AppSettings__AuthProvider=OIDC
-      - AppSettings__OIDC__Authority=https://auth.chopinsight.cn/application/o/employeecenter
+      - AppSettings__OIDC__Authority=https://auth.hlwuxi.com/application/o/employeecenter
       - AppSettings__OIDC__ClientId={{EPEC_CLIENT_ID}}
       - AppSettings__OIDC__ClientSecret={{EPEC_CLIENT_SECRET}}
       - AppSettings__OCR__Enabled=false
@@ -41,12 +41,12 @@ services:
         delay: 60s
 
   agent:
-    image: hub.chopinsight.cn/aiursoft/folderagent:latest
+    image: hub.hlwuxi.com/aiursoft/folderagent:latest
     volumes:
       - employeecenter-context:/import:ro
     environment:
       - ANTHROPIC_API_KEY={{CHOPIN_EMPLOYEE_AGENT_KEY}}
-      - ANTHROPIC_BASE_URL=https://ollama.chopinsight.cn
+      - ANTHROPIC_BASE_URL=https://ollama.hlwuxi.com
       - CLAUDE_MODEL=aiursoft-super:latest
       - PROVIDER=claude
     networks:
@@ -64,7 +64,7 @@ services:
         delay: 5s
 
   db:
-    image: hub.chopinsight.cn/mysql:9.7.0
+    image: hub.hlwuxi.com/mysql:9.7.0
     command: --skip-log-bin
     volumes:
       - employeecenter-db:/var/lib/mysql

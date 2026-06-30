@@ -1,6 +1,6 @@
 {
 	# Email for Let's Encrypt notifications (certificate expiration, etc.)
-	email clare.xu@chopinsight.cn
+	email clare.xu@hlwuxi.com
 	
 	log {
 		format json

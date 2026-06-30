@@ -596,8 +596,8 @@ deploy stage2/stacks/incoming/docker-compose.yml incoming # 8080
 
 print_ok "Make sure the caddy is ready..."
 sleep 5 # Could not trust result in the first few seconds, because the old registry might still be running
-while [ "$(curl -s -o /dev/null -w "%{http_code}" https://test.chopinsight.cn)" != "200" ]; do
-    print_warn "Waiting for caddy (https://test.chopinsight.cn) to start... ETA: 25s"
+while [ "$(curl -s -o /dev/null -w "%{http_code}" https://test.hlwuxi.com)" != "200" ]; do
+    print_warn "Waiting for caddy (https://test.hlwuxi.com) to start... ETA: 25s"
     sleep 1
 done
 
@@ -626,8 +626,8 @@ deploy stage3/stacks/authentik/docker-compose.yml authentik
 
 print_ok "Making sure the zot is ready..."
 sleep 5
-while [ "$(curl -s -o /dev/null -w "%{http_code}" https://hub.chopinsight.cn)" != "200" ]; do
-    print_warn "Waiting for registry (https://hub.chopinsight.cn) to start... ETA: 25s"
+while [ "$(curl -s -o /dev/null -w "%{http_code}" https://hub.hlwuxi.com)" != "200" ]; do
+    print_warn "Waiting for registry (https://hub.hlwuxi.com) to start... ETA: 25s"
     sleep 1
 done
 

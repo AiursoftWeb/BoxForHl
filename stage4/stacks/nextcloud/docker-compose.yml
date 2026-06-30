@@ -3,7 +3,7 @@ version: '3'
 services:
   web:
     # This version need to be updated regularly
-    image: hub.chopinsight.cn/nextcloud:32.0.5
+    image: hub.hlwuxi.com/nextcloud:32.0.5
     networks: 
       - internal
       - proxy_app
@@ -22,7 +22,7 @@ services:
       - MYSQL_HOST=nextclouddb
       - REDIS_HOST=redis
       - NEXTCLOUD_DATA_DIR=/mnt/data
-      - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.chopinsight.cn
+      - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.hlwuxi.com
       - PHP_MEMORY_LIMIT=1G
       - PHP_UPLOAD_LIMIT=1G
       - PHP_OPCACHE_ENABLE=1
@@ -42,7 +42,7 @@ services:
   nextcloud-jobrunner:
     depends_on:
       - web
-    image: hub.chopinsight.cn/alpine
+    image: hub.hlwuxi.com/alpine
     networks: 
       - internal
     volumes:
@@ -97,7 +97,7 @@ services:
         delay: 60s
 
   nextclouddb:
-    image: hub.chopinsight.cn/mysql:9.7.0
+    image: hub.hlwuxi.com/mysql:9.7.0
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --skip-log-bin
     networks: 
       - internal
@@ -127,7 +127,7 @@ services:
         delay: 60s
 
   redis:
-    image: hub.chopinsight.cn/redis:alpine
+    image: hub.hlwuxi.com/redis:alpine
     volumes:
       - nextcloud-redis:/data
     networks: 

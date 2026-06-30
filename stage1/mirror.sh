@@ -30,6 +30,3 @@ mirror_image "redis:alpine"
 
 echo "Mirroring GoAuthentik server..."
 mirror_image "ghcr.io/goauthentik/server:2026.2.1"
-
-echo "Mirroring Vikunja..."
-mirror_image "vikunja/vikunja"

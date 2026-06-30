@@ -5,7 +5,7 @@ services:
   downloader:
     image: localhost:8080/box_starting/local_puller
     environment:
-      - MIRROR_TARGET=hub.chopinsight.cn
+      - MIRROR_TARGET=hub.hlwuxi.com
       - DOCKER_USERNAME={{DOCKER_HUB_USERNAME}}
       - DOCKER_PASSWORD={{DOCKER_HUB_PASSWORD}}
       - LOCAL_DOCKER_USERNAME={{LOCAL_DOCKER_USERNAME}}

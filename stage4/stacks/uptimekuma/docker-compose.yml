@@ -3,14 +3,14 @@ version: '3.9'
 
 services:
   authentik_proxy:
-    image: hub.chopinsight.cn/ghcr.io/goauthentik/proxy:2026.2.1 
+    image: hub.hlwuxi.com/ghcr.io/goauthentik/proxy:2026.2.1 
     volumes:
       - type: bind
         source: /dev/shm
         target: /dev/shm
         read_only: false
     environment:
-      AUTHENTIK_HOST: "https://auth.chopinsight.cn/"
+      AUTHENTIK_HOST: "https://auth.hlwuxi.com/"
       AUTHENTIK_INSECURE: "false"
       AUTHENTIK_TOKEN: "{{UPTIMEKUMA_OUTPOST_TOKEN}}"
     stop_grace_period: 20s
@@ -29,7 +29,7 @@ services:
         delay: 5s
 
   server:
-    image: hub.chopinsight.cn/louislam/uptime-kuma:latest
+    image: hub.hlwuxi.com/louislam/uptime-kuma:latest
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - uptime-kuma:/app/data

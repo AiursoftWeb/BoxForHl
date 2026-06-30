@@ -269,7 +269,7 @@ images=(
     "aiursoft/kahla"
     "aiursoft/manhours"
     "aiursoft/marktohtml"
-    "aiursoft/moongladepure"
+    "aiursoft/moongladev2"
     "aiursoft/musicexam"
     "aiursoft/musictools"
     "aiursoft/nugetninja"

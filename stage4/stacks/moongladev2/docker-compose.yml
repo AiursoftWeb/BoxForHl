@@ -1,0 +1,34 @@
+services:
+  moongladev2:
+    image: pubhub.aiursoft.com/aiursoft/moongladev2
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__MoongladeDatabase=Server=db;Database=moonglade;Uid=root;Pwd=${MYSQL_PASSWORD};OldGuids=true;CharSet=utf8
+      - OIDC__Authority=https://auth.hlwuxi.com/application/o/moongladev2
+      - OIDC__ClientId=${MOONGLADEV2_CLIENT_ID}
+      - OIDC__ClientSecret=${MOONGLADEV2_CLIENT_SECRET}
+    networks:
+      - app
+
+  db:
+    image: pubhub.aiursoft.com/mysql:9.7.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=moonglade
+    volumes:
+      - moonglade_mysql:/var/lib/mysql
+    networks:
+      - app
+
+networks:
+  app:
+    external: true
+
+volumes:
+  moonglade_mysql:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/moonglade_mysql

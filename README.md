@@ -1,18 +1,18 @@
-# BoxForChopart ⚙️
+# BoxForHlart ⚙️
 
-**Role:** Chopart Node Management & Service Hosting
+**Role:** Hlart Node Management & Service Hosting
 
-This repository contains the configuration and deployment logic for the **Chopart Server** of the Aiursoft Hybrid Cloud.
+This repository contains the configuration and deployment logic for the **Hlart Server** of the Aiursoft Hybrid Cloud.
 
 ## 🎯 Strategic Objective
-To provide a self-contained, high-performance environment for hosting services on the Chopart server, with full integration for FRP, Authentik, and Vikunja.
+To provide a self-contained, high-performance environment for hosting services on the Hlart server, with full integration for FRP, Authentik, and Vikunja.
 
 ## 🏗 Architecture Specifics
 *   **Infrastructure:** Built on top of the Aiursoft Box project architecture.
 *   **Network:** Uses FRP for tunneling and Caddy for domain management.
 *   **Authentication:** Fully integrated with Authentik for centralized identity management.
 *   **Services:** Currently hosts Vikunja as the primary task management platform.
-*   **Domains:** All services are hosted under the `chopinsight.cn` domain.
+*   **Domains:** All services are hosted under the `hlwuxi.com` domain.
 
 ## 📦 Stacks Included
 *   **Stage 0:** Local Registry for bootstrapping.
@@ -68,12 +68,12 @@ services:
 All images **must** be pulled from the local registry mirror, never directly from Docker Hub.
 
 ```yaml
-image: hub.chopinsight.cn/<original-path>:<tag>
+image: hub.hlwuxi.com/<original-path>:<tag>
 
 # Examples
-image: hub.chopinsight.cn/mysql
-image: hub.chopinsight.cn/vikunja/vikunja:latest
-image: hub.chopinsight.cn/ghcr.io/goauthentik/proxy:2026.2.1
+image: hub.hlwuxi.com/mysql
+image: hub.hlwuxi.com/vikunja/vikunja:latest
+image: hub.hlwuxi.com/ghcr.io/goauthentik/proxy:2026.2.1
 ```
 
 Exception: bootstrap-phase images (before the hub is available) use `localhost:8080/...`.
@@ -261,7 +261,7 @@ deploy:
 | Stateful (database, persistent app) | `stop-first` | `60s` |
 | Stateless / proxy / sidecar | `start-first` | `5s` |
 
-**`shepherd.autoupdate` rule:** Only add this label when the image comes from `hub.chopinsight.cn`. Locally-built images must **not** have this label since shepherd cannot update them.
+**`shepherd.autoupdate` rule:** Only add this label when the image comes from `hub.hlwuxi.com`. Locally-built images must **not** have this label since shepherd cannot update them.
 
 ---
 
@@ -269,7 +269,7 @@ deploy:
 
 ```yaml
 db:
-  image: hub.chopinsight.cn/mysql
+  image: hub.hlwuxi.com/mysql
   volumes:
     - <app>-db:/var/lib/mysql
   environment:
@@ -312,7 +312,7 @@ environment:
   - ConnectionStrings__DbType=MySql
   - Storage__Path=/data/files
   - AppSettings__AuthProvider=OIDC
-  - AppSettings__OIDC__Authority=https://auth.chopinsight.cn/application/o/<app-slug>
+  - AppSettings__OIDC__Authority=https://auth.hlwuxi.com/application/o/<app-slug>
   - AppSettings__OIDC__ClientId={{APP_CLIENT_ID}}
   - AppSettings__OIDC__ClientSecret={{APP_CLIENT_SECRET}}
   - Logging__Clickhouse__Enabled=true
@@ -340,9 +340,9 @@ For services that do **not** have native OIDC support, add an `authentik_proxy` 
 
 ```yaml
 authentik_proxy:
-  image: hub.chopinsight.cn/ghcr.io/goauthentik/proxy:2026.2.1
+  image: hub.hlwuxi.com/ghcr.io/goauthentik/proxy:2026.2.1
   environment:
-    AUTHENTIK_HOST: "https://auth.chopinsight.cn/"
+    AUTHENTIK_HOST: "https://auth.hlwuxi.com/"
     AUTHENTIK_INSECURE: "false"
     AUTHENTIK_TOKEN: "{{APP_OUTPOST_TOKEN}}"
   stop_grace_period: 20s
@@ -364,7 +364,7 @@ authentik_proxy:
 **In `<stack>.conf` (Caddy):**
 
 ```caddyfile
-domain.chopinsight.cn {
+domain.hlwuxi.com {
     log
     import hsts
     encode br gzip
@@ -394,7 +394,7 @@ Every service exposed to the internet gets a `<stack>.conf` file placed in `stag
 Standard block (no auth proxy needed):
 
 ```caddyfile
-domain.chopinsight.cn {
+domain.hlwuxi.com {
     log
     import hsts
     encode br gzip
@@ -408,7 +408,7 @@ Naming rule: the upstream hostname inside Caddy follows Docker Swarm's DNS conve
 
 ### 15. Shepherd Auto-Update Label
 
-Add `shepherd.autoupdate: "true"` to the `deploy.labels` of every service whose image comes from `hub.chopinsight.cn`. Do **not** add it for locally-built images (`localhost:8080/box_starting/...`) because shepherd cannot pull those.
+Add `shepherd.autoupdate: "true"` to the `deploy.labels` of every service whose image comes from `hub.hlwuxi.com`. Do **not** add it for locally-built images (`localhost:8080/box_starting/...`) because shepherd cannot pull those.
 
 ---
 
@@ -489,7 +489,7 @@ reverse_proxy http://stathub_app:80
 
 ```yaml
 postgresql:
-  image: hub.chopinsight.cn/postgres:16-alpine
+  image: hub.hlwuxi.com/postgres:16-alpine
   volumes:
     - <app>-database:/var/lib/postgresql/data
   environment:
@@ -525,7 +525,7 @@ Note: The `$$` double-dollar escape is required in `docker-compose.yml` to preve
 
 ```yaml
 redis:
-  image: hub.chopinsight.cn/redis:alpine
+  image: hub.hlwuxi.com/redis:alpine
   volumes:
     - <app>-redis:/data
   networks:
@@ -582,7 +582,7 @@ environment:
   - OLLAMA_HOST=0.0.0.0
 ```
 
-**Important:** The host ID (e.g., `Chopart-NUC`) in `env` files **must** match the hostname returned by `hostname -s` — this is how `deploy.sh` identifies which node gets GPU-constrained services.
+**Important:** The host ID (e.g., `Hlart-NUC`) in `env` files **must** match the hostname returned by `hostname -s` — this is how `deploy.sh` identifies which node gets GPU-constrained services.
 
 ---
 
@@ -804,7 +804,7 @@ When adding a new business service, follow this checklist in order:
 
 1. **Create the stack directory:** `stage4/stacks/<stack-name>/`
 2. **Write `docker-compose.yml`** following §2 (service field order), §10 (deploy block), and §24 (deploy field order)
-3. **Image source:** Use `hub.chopinsight.cn/<path>` (§3). If the image is not yet mirrored, add it to `stage1/mirror.sh`
+3. **Image source:** Use `hub.hlwuxi.com/<path>` (§3). If the image is not yet mirrored, add it to `stage1/mirror.sh`
 4. **Volumes:** Bind-mount under `/swarm-vol/<stack-name>/<purpose>` (§4)
 5. **Networks:** Assign according to the network table (§5)
 6. **Secrets:** Use `{{UPPER_SNAKE_CASE}}` for external secrets, `<lower_snake_case>` for intra-stack passwords (§7)
@@ -826,26 +826,26 @@ When adding a new business service, follow this checklist in order:
 
 ## TODO
 
-marktohtml.chopinsight.cn
-vault.chopinsight.cn
-minio.chopinsight.cn
-litellm.chopinsight.cn
+marktohtml.hlwuxi.com
+vault.hlwuxi.com
+minio.hlwuxi.com
+litellm.hlwuxi.com
 
 ## Done
 
-nextcloud.chopinsight.cn
-uptime.chopinsight.cn
-auth.chopinsight.cn
-test.chopinsight.cn
-clickhouse.chopinsight.cn
-grafana.chopinsight.cn
-hub.chopinsight.cn
-vikunja.chopinsight.cn
-tracer.chopinsight.cn
-stathub.chopinsight.cn
-employee.chopinsight.cn
-ollama.chopinsight.cn
-openweb.chopinsight.cn
-ocr.chopinsight.cn
-gitlab.chopinsight.cn
-tty.chopinsight.cn
+nextcloud.hlwuxi.com
+uptime.hlwuxi.com
+auth.hlwuxi.com
+test.hlwuxi.com
+clickhouse.hlwuxi.com
+grafana.hlwuxi.com
+hub.hlwuxi.com
+vikunja.hlwuxi.com
+tracer.hlwuxi.com
+stathub.hlwuxi.com
+employee.hlwuxi.com
+ollama.hlwuxi.com
+openweb.hlwuxi.com
+ocr.hlwuxi.com
+gitlab.hlwuxi.com
+tty.hlwuxi.com

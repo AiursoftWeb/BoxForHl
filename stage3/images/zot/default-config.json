@@ -31,7 +31,7 @@
 		"compat": [
 			"docker2s2"
 		],
-		"externalUrl": "https://hub.chopinsight.cn",
+		"externalUrl": "https://hub.hlwuxi.com",
 		"accessControl": {
 			"repositories": {
 				"**": {
@@ -44,7 +44,7 @@
 				}
 			},
 			"adminPolicy": {
-				"users": ["clare.xu@chopinsight.cn"],
+				"users": ["clare.xu@hlwuxi.com"],
 				"actions": ["read", "create", "update", "delete"]
 			}
 		},
@@ -55,7 +55,7 @@
 					"oidc": {
 						"credentialsFile": "/config/sso-oidc-credentials.json",
 						"name": "Aiursoft",
-						"issuer": "https://auth.chopinsight.cn/application/o/cn-zot/",
+						"issuer": "https://auth.hlwuxi.com/application/o/cn-zot/",
 						"keypath": "",
 						"scopes": ["openid", "profile", "email"]
 					}

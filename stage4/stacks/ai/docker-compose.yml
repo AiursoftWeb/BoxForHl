@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   ollama-server:
-    image: hub.chopinsight.cn/ollama/ollama:latest
+    image: hub.hlwuxi.com/ollama/ollama:latest
     volumes:
       - ollama-data:/root/.ollama
     networks:
@@ -45,8 +45,45 @@ services:
         delay: 5s
         max_attempts: 3
 
+  ollama-gateway-app:
+    depends_on:
+      - ollama-gateway-db
+    image: hub.hlwuxi.com/aiursoft/ollamagateway
+    volumes:
+      - ollama-gateway-aspnet:/data/.aspnet/
+      - ollama-gateway-files:/data/files
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=ollama-gateway-db;Database=ollama_gateway;Uid=ollama_gateway;Pwd=<ollama_gateway_password>;
+      - ConnectionStrings__DbType=MySql
+      - Storage__Path=/data/files
+      - AppSettings__AuthProvider=OIDC
+      - AppSettings__OIDC__Authority=https://auth.hlwuxi.com/application/o/ollama-gateway
+      - AppSettings__OIDC__ClientId={{OLLAMA_GATEWAY_CLIENT_ID}}
+      - AppSettings__OIDC__ClientSecret={{OLLAMA_GATEWAY_CLIENT_SECRET}}
+      - Logging__Clickhouse__Enabled=true
+      - Logging__Clickhouse__ConnectionString=Host=clickhouse;User=default;Password=123456;Database=AspNetCoreLogs
+      - Logging__Clickhouse__TableName=OllamaGatewayLogs
+      - Clickhouse__Enabled=true
+      - Clickhouse__ConnectionString=Host=clickhouse;Protocol=http;Port=8123;User=default;Password=123456;Database=default
+      - Clickhouse__TableName=RequestLogs
+    networks:
+      - proxy_app
+      - internal
+      - clickhouse_net
+    stop_grace_period: 20s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: '6.0'
+          memory: 8G
+      update_config:
+        order: start-first
+        delay: 5s
+
   ollama-gateway-db:
-    image: hub.chopinsight.cn/mysql:9.7.0
+    image: hub.hlwuxi.com/mysql:9.7.0
     command: --skip-log-bin
     volumes:
       - ollama-gateway-db:/var/lib/mysql
@@ -58,68 +95,25 @@ services:
     networks:
       - internal
     stop_grace_period: 60s
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root --silent"]
-      start_period: 20s
-      interval: 30s
-      retries: 5
-      timeout: 5s
     deploy:
       labels:
         shepherd.autoupdate: "true"
       resources:
         limits:
-          cpus: '4.0'
-          memory: 8G
+          cpus: '2.0'
+          memory: 4G
       update_config:
         order: stop-first
         delay: 60s
 
-  ollama-gateway-app:
-    depends_on:
-      - ollama-gateway-db
-    image: hub.chopinsight.cn/aiursoft/ollamagateway:latest
-    volumes:
-      - ollama-gateway-files:/data/files
-      - ollama-gateway-aspnet:/data/.aspnet
-    environment:
-      - ConnectionStrings__DefaultConnection=Server=ollama-gateway-db;Database=ollama_gateway;Uid=ollama_gateway;Pwd=<ollama_gateway_password>;
-      - ConnectionStrings__DbType=MySql
-      - Storage__Path=/data/files
-      - AppSettings__AuthProvider=OIDC
-      - AppSettings__OIDC__Authority=https://auth.chopinsight.cn/application/o/ollama-gateway
-      - AppSettings__OIDC__ClientId={{OLLAMA_GATEWAY_CLIENT_ID}}
-      - AppSettings__OIDC__ClientSecret={{OLLAMA_GATEWAY_CLIENT_SECRET}}
-      - Logging__Clickhouse__Enabled=true
-      - Logging__Clickhouse__ConnectionString=Host=clickhouse;User=default;Password=123456;Database=AspNetCoreLogs
-      - Logging__Clickhouse__TableName=OllamaGatewayLogs
-      - Clickhouse__Enabled=true
-      - Clickhouse__ConnectionString=Host=clickhouse;Protocol=http;Port=8123;User=default;Password=123456;Database=default
-      - Clickhouse__TableName=RequestLogs
-    networks:
-      - internal
-      - proxy_app
-      - clickhouse_net
-    stop_grace_period: 20s
-    deploy:
-      labels:
-        shepherd.autoupdate: "true"
-      resources:
-        limits:
-          cpus: '4.0'
-          memory: 4G
-      update_config:
-        order: start-first
-        delay: 5s
-
   code-runner:
-    image: hub.chopinsight.cn/aiursoft/cpprunner
+    image: hub.hlwuxi.com/aiursoft/cpprunner
     volumes:
       - code-runner-aspnet-data:/data/.aspnet
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp:/tmp
     environment:
-      - DockerImageSettings__Prefix=hub.chopinsight.cn
+      - DockerImageSettings__Prefix=hub.hlwuxi.com
     networks:
       - internal
     stop_grace_period: 20s
@@ -138,7 +132,7 @@ services:
   mcpo:
     depends_on:
       - code-runner
-    image: hub.chopinsight.cn/ghcr.io/open-webui/mcpo:main
+    image: hub.hlwuxi.com/ghcr.io/open-webui/mcpo:main
     networks:
       - internal
     volumes:
@@ -160,7 +154,7 @@ services:
     depends_on:
       - mcpo
       - ollama-gateway-app
-    image: hub.chopinsight.cn/ghcr.io/open-webui/open-webui:main
+    image: hub.hlwuxi.com/ghcr.io/open-webui/open-webui:main
     environment:
       - 'OLLAMA_BASE_URL=http://ollama-gateway-app:5000/'
       - ENABLE_OPENAI_API=False
@@ -179,13 +173,13 @@ services:
       - ENABLE_OAUTH_ROLE_MANAGEMENT=True
       - OAUTH_MERGE_ACCOUNTS_BY_EMAIL=True
       - OAUTH_ADMIN_ROLES=openweb-admins
-      - OAUTH_PROVIDER_NAME=ChopInsight
+      - OAUTH_PROVIDER_NAME=Aiursoft
       - OAUTH_ROLES_CLAIM=groups
-      - 'OPENID_PROVIDER_URL=https://auth.chopinsight.cn/application/o/openwebchat/.well-known/openid-configuration'
+      - 'OPENID_PROVIDER_URL=https://auth.hlwuxi.com/application/o/openwebchat/.well-known/openid-configuration'
       - OAUTH_CLIENT_ID={{OPENWEB_CLIENT_ID}}
       - OAUTH_CLIENT_SECRET={{OPENWEB_CLIENT_SECRET}}
       - 'OAUTH_SCOPES=openid email profile'
-      - OPENID_REDIRECT_URI=https://openweb.chopinsight.cn/oauth/oidc/callback
+      - OPENID_REDIRECT_URI=https://openweb.hlwuxi.com/oauth/oidc/callback
       - OAUTH_UPDATE_NAME_ON_LOGIN=True
       - OAUTH_UPDATE_PICTURE_ON_LOGIN=True
       - OAUTH_UPDATE_EMAIL_ON_LOGIN=True

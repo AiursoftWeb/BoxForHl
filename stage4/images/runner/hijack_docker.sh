@@ -10,7 +10,7 @@ fi
 
 # Target domains to inject
 TARGET_DOMAINS=(
-    "hub.chopinsight.cn"
+    "hub.hlwuxi.com"
 )
 
 # Build arguments array
