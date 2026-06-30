@@ -31,25 +31,3 @@ remotePort = 443
 transport.useCompression = true
 transport.proxyProtocolVersion = "v2"
 transport.bandwidthLimit = "3MB"
-
-# Regular update to ensure safe.
-[[proxies]]
-name = "ssh_gitlab"
-type = "tcp"
-localIP = "gitlab_gitlab"
-localPort = 2202
-remotePort = 2202
-
-transport.useCompression = true
-transport.bandwidthLimit = "3MB"
-
-
-# PostgreSQL Tunnel for ChopInsight
-[[proxies]]
-name = "postgresql"
-type = "tcp"
-localIP = "pg_postgresql"
-localPort = 5432
-remotePort = 5432
-transport.useCompression = true
-transport.bandwidthLimit = "3MB"

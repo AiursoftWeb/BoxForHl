@@ -642,9 +642,9 @@ print_warn "   Starting stage 4: Mission is to deploy business stacks"
 print_warn "=============================================================================="
 sleep 3
 
-print_ok "Building local runner..."
-sudo docker build --network=host ./stage4/images/runner -t localhost:8080/box_starting/local_runner:latest
-sudo docker push localhost:8080/box_starting/local_runner:latest
+print_ok "Building local paddleocr..."
+sudo docker build --network=host ./stage4/images/paddleocr -t localhost:8080/box_starting/local_paddleocr:latest
+sudo docker push localhost:8080/box_starting/local_paddleocr:latest
 
 print_ok "Ensuring binfmt support for multi-arch builds..."
 if [ -f /proc/sys/fs/binfmt_misc/qemu-aarch64 ]; then

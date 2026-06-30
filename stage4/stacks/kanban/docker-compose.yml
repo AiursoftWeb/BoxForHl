@@ -4,7 +4,7 @@ services:
   app:
     depends_on:
       - db
-    image: pubhub.hlwuxi.com/aiursoft/kanban:latest
+    image: hub.hlwuxi.com/aiursoft/kanban:latest
     volumes:
       - kanban-aspnet:/data/.aspnet/
       - kanban-files:/data/files
@@ -39,7 +39,7 @@ services:
         delay: 5s
 
   db:
-    image: pubhub.hlwuxi.com/mysql:9.7.0
+    image: hub.hlwuxi.com/mysql:9.7.0
     command: --skip-log-bin
     volumes:
       - kanban-db:/var/lib/mysql

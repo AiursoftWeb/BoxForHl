@@ -2,14 +2,13 @@ version: '3.9'
 
 services:
   app:
-    image: hub.hlwuxi.com/hlwuxi/internalimages/paddleocr:latest
+    image: localhost:8080/box_starting/local_paddleocr:latest
     volumes:
       - type: tmpfs
         target: /dev/shm
     environment:
-      # Optional: If you want to require authentication for API calls, set this in your .env
       - OCR_ACCESS_TOKEN={{OCR_ACCESS_TOKEN}}
-      - USE_GPU=true # Set to false to force CPU mode
+      - USE_GPU=true
     networks:
       - proxy_app
       - internal
@@ -25,59 +24,14 @@ services:
         shepherd.autoupdate: "true"
       resources:
         limits:
-          cpus: '4.0'
+          cpus: '16.0'
           memory: 12G
       update_config:
-        order: stop-first
-        delay: 10s
-
-  customer_ocr:
-    image: hub.hlwuxi.com/hlwuxi/internalimages/customer_ocr:latest
-    volumes:
-      - type: tmpfs
-        target: /dev/shm
-      - customer-ocr-tmp:/tmp/customer_ocr
-    environment:
-      - OCR_ACCESS_TOKEN={{OCR_ACCESS_TOKEN}}
-      - USE_GPU=true
-      - PDF_CONCURRENCY=2
-      - PAGE_CONCURRENCY=3
-      - TASK_TTL_MINUTES=60
-    networks:
-      - proxy_app
-      - internal
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8100/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-    stop_grace_period: 20s
-    deploy:
-      labels:
-        shepherd.autoupdate: "true"
-      resources:
-        limits:
-          cpus: '4.0'
-          memory: 12G
-      update_config:
-        order: stop-first
-        delay: 10s
-      restart_policy:
-        condition: any
+        order: start-first
         delay: 5s
-        max_attempts: 3
 
 networks:
   proxy_app:
     external: true
   internal:
     driver: overlay
-
-volumes:
-  customer-ocr-tmp:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /swarm-vol/ocr/customer_ocr_tmp

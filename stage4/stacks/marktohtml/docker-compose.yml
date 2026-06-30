@@ -4,7 +4,7 @@ services:
   app:
     depends_on:
       - db
-    image: pubhub.hlwuxi.com/aiursoft/marktohtml:latest
+    image: hub.hlwuxi.com/aiursoft/marktohtml:latest
     volumes:
       - marktohtml-aspnet:/data/.aspnet/
       - marktohtml-files:/data/files
@@ -39,7 +39,7 @@ services:
         delay: 5s
 
   db:
-    image: pubhub.hlwuxi.com/mysql:9.7.0
+    image: hub.hlwuxi.com/mysql:9.7.0
     command: --skip-log-bin
     volumes:
       - marktohtml-db:/var/lib/mysql

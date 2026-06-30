@@ -1,6 +1,6 @@
 services:
   moongladev2:
-    image: pubhub.aiursoft.com/aiursoft/moongladev2
+    image: hub.hlwuxi.com/aiursoft/moongladev2
     depends_on:
       - db
     environment:
@@ -12,7 +12,7 @@ services:
       - app
 
   db:
-    image: pubhub.aiursoft.com/mysql:9.7.0
+    image: hub.hlwuxi.com/mysql:9.7.0
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_DATABASE=moonglade
