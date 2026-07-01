@@ -258,6 +258,7 @@ images=(
     "joxit/docker-registry-ui"
 
     # ── Stage 1: Base Images (mirrored first, used as localhost:8080/public_mirror/…) ──
+    "ubuntu:26.04"
     "ubuntu:25.10"
     "ubuntu:24.04"
     "ubuntu:22.04"
@@ -320,6 +321,8 @@ images=(
     "aiursoft/translate"
     # UptimeKuma
     "louislam/uptime-kuma"
+    # Vaultwarden
+    "vaultwarden/server"
     # Warp
     "aiursoft/warp"
     # docker tools

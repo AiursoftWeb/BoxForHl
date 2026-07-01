@@ -10,7 +10,6 @@ from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 import logging
 
-import uvloop
 from clickhouse_connect import get_client
 
 # === Logging setup ===
@@ -25,7 +24,7 @@ CH_PASS = os.getenv('CLICKHOUSE_PASSWORD', '')
 CH_DB = os.getenv('CLICKHOUSE_DATABASE', 'logs')
 CH_TABLE = os.getenv('CLICKHOUSE_TABLE', 'caddy_requests')
 BATCH_SIZE = int(os.getenv('BATCH_SIZE', '1000'))
-FLUSH_INTERVAL = float(os.getenv('FLUSH_INTERVAL_SEC', '2'))
+FLUSH_INTERVAL = float(os.getenv('FLUSH_INTERVAL_SEC', '30'))
 TZ = ZoneInfo(os.getenv('TZ', 'UTC'))
 
 # Columns in ClickHouse order
@@ -146,24 +145,25 @@ def transform(rec):
 
 async def flusher(queue):
     client = create_ch_client()
-    batch, last_flush = [], time.time()
+    batch, batch_start = [], time.time()
     while not stop_event.is_set():
         try:
-            item = await asyncio.wait_for(queue.get(), timeout=FLUSH_INTERVAL)
+            item = await asyncio.wait_for(queue.get(), timeout=0.5)
             batch.append(item)
-            logger.debug("Queued batch size: %d", len(batch))
         except asyncio.TimeoutError:
             pass
         now = time.time()
-        if batch and (len(batch) >= BATCH_SIZE or now - last_flush >= FLUSH_INTERVAL):
+        if not batch:
+            batch_start = now
+            continue
+        if len(batch) >= BATCH_SIZE or now - batch_start >= FLUSH_INTERVAL:
             try:
                 logger.info("Flushing %d rows to ClickHouse", len(batch))
                 client.insert(CH_TABLE, batch, column_names=COLUMNS)
             except Exception as e:
                 logger.error("Insert failed: %s", e)
-            else:
-                batch.clear()
-                last_flush = now
+            batch.clear()
+            batch_start = time.time()
     if batch:
         try:
             logger.info("Final flush of %d rows", len(batch))
@@ -221,23 +221,15 @@ def handle_signal(signum, frame):
     stop_event.set()
 
 
+async def _run():
+    queue = asyncio.Queue(maxsize=50000)
+    await asyncio.gather(reader(queue), flusher(queue))
+
+
 def main():
     signal.signal(signal.SIGTERM, handle_signal)
     signal.signal(signal.SIGINT, handle_signal)
-    uvloop.install()
-    loop = asyncio.get_event_loop()
-    queue = asyncio.Queue(maxsize=50000)
-    tasks = [
-        loop.create_task(reader(queue)),
-        loop.create_task(flusher(queue)),
-    ]
-    try:
-        loop.run_until_complete(asyncio.gather(*tasks))
-    finally:
-        for t in tasks:
-            t.cancel()
-        loop.stop()
-        loop.close()
+    asyncio.run(_run())
 
 
 if __name__ == '__main__':

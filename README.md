@@ -739,7 +739,7 @@ Custom Dockerfiles in `stage<N>/images/<name>/` follow these rules:
 FROM localhost:8080/box_starting/local_ubuntu
 
 # Mirrored public image
-FROM localhost:8080/public_mirror/ubuntu:25.10
+FROM localhost:8080/public_mirror/ubuntu:26.04
 ```
 
 **Multi-stage builds:** Use `AS <stage-name>` to name build stages:
