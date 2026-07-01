@@ -73,7 +73,7 @@ image: hub.hlwuxi.com/<original-path>:<tag>
 # Examples
 image: hub.hlwuxi.com/mysql
 image: hub.hlwuxi.com/vikunja/vikunja:latest
-image: hub.hlwuxi.com/ghcr.io/goauthentik/proxy:2026.2.1
+image: hub.hlwuxi.com/ghcr.io/goauthentik/proxy:2026.5.3
 ```
 
 Exception: bootstrap-phase images (before the hub is available) use `localhost:8080/...`.
@@ -340,7 +340,7 @@ For services that do **not** have native OIDC support, add an `authentik_proxy` 
 
 ```yaml
 authentik_proxy:
-  image: hub.hlwuxi.com/ghcr.io/goauthentik/proxy:2026.2.1
+  image: hub.hlwuxi.com/ghcr.io/goauthentik/proxy:2026.5.3
   environment:
     AUTHENTIK_HOST: "https://auth.hlwuxi.com/"
     AUTHENTIK_INSECURE: "false"

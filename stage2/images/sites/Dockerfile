@@ -31,7 +31,8 @@ COPY --from=caddy-build-env /usr/bin/caddy /usr/bin/caddy
 COPY --from=config-build-env /app/Dist/Caddyfile /etc/caddy/Caddyfile
 
 # Check if any fatal errors in caddyfile
-RUN caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile && \
+RUN caddy fmt --overwrite /etc/caddy/Caddyfile && \
+    caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile && \
     mkdir -p /var/log/caddy /data/caddy/logs && \
     touch /data/caddy/logs/web.log
 

@@ -286,8 +286,8 @@ images=(
     "containrrr/shepherd"
 
     # ── Stage 3: Auth & Registry ──
-    "ghcr.io/goauthentik/server:2026.2.1"
-    "ghcr.io/goauthentik/proxy:2026.2.1"
+    "ghcr.io/goauthentik/server:2026.5.3"
+    "ghcr.io/goauthentik/proxy:2026.5.3"
 
     # ── Stage 4: Applications ──
     # AI / LLM

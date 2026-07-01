@@ -1,90 +1,86 @@
 {
-	"distSpecVersion": "1.0.1",
-	"storage": {
-		"rootDirectory": "/data",
-		"dedupe": true,
-		"gc": true,
-		"gcInterval": "48h",
-		"retention": {
-			"dryRun": false,
-			"delay": "0h",
-			"policies": [
-				{
-					"repositories": ["**"],
-					"deleteReferrers": true,
-					"deleteUntagged": true,
-					"keepTags": [
-						{
-							"mostRecentlyPushedCount": 2,
-							"pulledWithin": "168h"
-						}
-					]
-				}
-			]
-		}
+    "distSpecVersion": "1.0.1",
+    "storage": {
+        "rootDirectory": "/data",
+        "dedupe": true,
+        "gc": true,
+        "gcInterval": "72h",
+        "retention": {
+            "dryRun": false,
+            "delay": "0h",
+            "policies": [
+                {
+                    "repositories": ["**"],
+                    "deleteReferrers": true,
+                    "deleteUntagged": true,
+                    "keepTags": [
+                        {
+                            "mostRecentlyPushedCount": 2,
+                            "pulledWithin": "168h"
+                        }
+                    ]
+                }
+            ]
+        }
 
-	},
-	"http": {
-		"address": "0.0.0.0",
-		"port": "5000",
-		"realm": "zot",
-		"compat": [
-			"docker2s2"
-		],
-		"externalUrl": "https://hub.hlwuxi.com",
-		"accessControl": {
-			"repositories": {
-				"**": {
-					"anonymousPolicy": [
-						"read"
-					],
-					"defaultPolicy": [
-						"read"
-					]
-				}
-			},
-			"adminPolicy": {
-				"users": ["clare.xu@hlwuxi.com"],
-				"actions": ["read", "create", "update", "delete"]
-			}
-		},
-		"auth": {
-			"apikey": true,
-			"openid": {
-				"providers": {
-					"oidc": {
-						"credentialsFile": "/config/sso-oidc-credentials.json",
-						"name": "Aiursoft",
-						"issuer": "https://auth.hlwuxi.com/application/o/cn-zot/",
-						"keypath": "",
-						"scopes": ["openid", "profile", "email"]
-					}
-				}
-			}
-		}
+    },
+    "http": {
+        "address": "0.0.0.0",
+        "port": "5000",
+        "realm": "zot",
+        "compat": [
+            "docker2s2"
+        ],
+        "externalUrl": "https://hub.hlwuxi.com",
+        "accessControl": {
+            "repositories": {
+                "**": {
+                    "anonymousPolicy": [
+                        "read"
+                    ],
+                    "defaultPolicy": [
+                        "read"
+                    ]
+                }
+            },
+            "adminPolicy": {
+                "users": ["clare.xu@hlwuxi.com"],
+                "actions": ["read", "create", "update", "delete"]
+            }
+        },
+        "auth": {
+            "apikey": true,
+            "openid": {
+                "providers": {
+                    "oidc": {
+                        "credentialsFile": "/config/sso-oidc-credentials.json",
+                        "name": "Aiursoft",
+                        "issuer": "https://auth.hlwuxi.com/application/o/cn-zot/",
+                        "keypath": "",
+                        "scopes": ["openid", "profile", "email"]
+                    }
+                }
+            }
+        }
 
-	},
-	"log": {
-		"level": "info",
-		"output": "stdout",
-		"audit": "stdout"
-	},
-	"extensions": {
-		"search": {
-			"enable": true,
-			"cve": {
-				"updateInterval": "24h"
-			}
-		},
-		"scrub": {
-			"enable": true,
-			"interval": "72h"
-		},
-		"ui": {
-			"enable": true
-		},
-		"mgmt": {
-			"enable": true
-		}
-	}
+    },
+    "log": {
+        "level": "info",
+        "output": "stdout",
+        "audit": "stdout"
+    },
+    "extensions": {
+        "search": {
+            "enable": true
+        },
+        "scrub": {
+            "enable": false
+        },
+        "ui": {
+            "enable": true
+        },
+        "mgmt": {
+            "enable": true
+        }
+    }
 }
