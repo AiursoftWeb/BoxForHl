@@ -55,9 +55,13 @@ services:
     image: localhost:8080/box_starting/local_frp
     networks:
       - frp_net
+      - xray_net
     environment:
       - FRP_SERVER={{FRP_SERVER}}
       - FRP_TOKEN={{FRP_TOKEN}}
+      - HTTP_PROXY=http://xray:10809
+      - HTTPS_PROXY=http://xray:10809
+      - NO_PROXY=10.0.0.0/8,localhost,127.0.0.1
     stop_grace_period: 60s
     deploy:
       resources:
@@ -82,4 +86,6 @@ networks:
   clickhouse_net:
     external: true
   frp_net:
+    external: true
+  xray_net:
     external: true
