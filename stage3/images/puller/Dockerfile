@@ -13,23 +13,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy all scripts in one layer
-COPY entry.sh start.sh source_updated.py /app/
-
-# Proxy for downloading regctl from GitHub (build containers on docker0 bridge)
-ARG HTTP_PROXY=http://172.17.0.1:10809
-ARG HTTPS_PROXY=http://172.17.0.1:10809
-ENV HTTP_PROXY=${HTTP_PROXY} HTTPS_PROXY=${HTTPS_PROXY}
-
-# Avoid cache invalidation for stable layers above, download regctl with freshness check
-#ADD "https://api.github.com/repos/regclient/regclient/commits?per_page=1" latest_commit
-RUN (curl -m 120 --retry 3 -L https://github.com/regclient/regclient/releases/latest/download/regctl-linux-amd64 -o /tmp/regctl-dl || \
-    (rm -f /tmp/regctl-dl && curl -m 120 --retry 3 -L https://git.aiursoft.com/PublicVault/regclient/releases/download/mirror/regctl-linux-amd64 -o /tmp/regctl-dl)) && \
-    (head -c 4 /tmp/regctl-dl | od -An -tx1 | tr -d ' \n' | grep -q '7f454c46' || (echo "ERROR: regctl download is not a valid ELF binary (likely blocked by CDN)"; head -c 200 /tmp/regctl-dl; false)) && \
-    mv /tmp/regctl-dl /usr/local/bin/regctl && \
-    chmod 755 /usr/local/bin/regctl
+COPY entry.sh start.sh source_updated.py ensure_regctl.sh /app/
 
 # Configure everything in one layer: permissions, logs, env, crontab
-RUN chmod +x /app/entry.sh /app/start.sh && \
+RUN chmod +x /app/entry.sh /app/start.sh /app/ensure_regctl.sh && \
     mkdir -p /app/sync_records && \
     touch /var/log/puller-cron.log && \
     # Fix cron in Docker: pam_loginuid.so requires CAP_AUDIT_WRITE which
@@ -44,4 +31,4 @@ RUN chmod +x /app/entry.sh /app/start.sh && \
     } >> /etc/environment && \
     (crontab -l 2>/dev/null || true; echo "20 */8 * * * . /etc/environment; /app/start.sh > /proc/1/fd/1 2>/proc/1/fd/2") | crontab -
 
-ENTRYPOINT ["tini", "--", "sh", "-c", "printenv | grep -v ' ' >> /etc/environment && cron -f -L 15"]
+ENTRYPOINT ["tini", "--", "sh", "-c", "printenv | grep -v ' ' >> /etc/environment && /app/ensure_regctl.sh && cron -f -L 15"]

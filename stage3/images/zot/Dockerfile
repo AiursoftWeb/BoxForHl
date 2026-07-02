@@ -1,8 +1,5 @@
-# The version need to be updated regularly.
-ARG ZOT_VERSION=v2.1.13
 FROM localhost:8080/box_starting/local_ubuntu
 
-ARG ZOT_VERSION
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
@@ -10,10 +7,6 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /etc/zot /config /data
-
-RUN (wget -O /usr/local/bin/zot "https://ghproxy.com/https://github.com/project-zot/zot/releases/download/${ZOT_VERSION}/zot-linux-amd64" || \
-    wget -O /usr/local/bin/zot "https://github.com/project-zot/zot/releases/download/${ZOT_VERSION}/zot-linux-amd64") && \
-    chmod +x /usr/local/bin/zot
 
 COPY default-config.json /etc/zot/default-config.json
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh

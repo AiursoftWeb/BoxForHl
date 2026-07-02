@@ -583,6 +583,12 @@ sudo docker push localhost:8080/box_starting/local_pysyncer:latest
 print_ok "Building local frp..."
 sudo docker build ./stage2/images/frp         -t localhost:8080/box_starting/local_frp:latest
 sudo docker push localhost:8080/box_starting/local_frp:latest
+print_ok "Building local xray..."
+sudo docker build ./stage2/images/xray -t localhost:8080/box_starting/local_xray:latest
+sudo docker push localhost:8080/box_starting/local_xray:latest
+
+print_ok "Starting xray proxy..."
+deploy stage2/stacks/xray/docker-compose.yml xray # 10809
 
 print_ok "Cleaning old docker-compose.yml..."
 rm -f ./stage2/stacks/incoming/docker-compose.yml

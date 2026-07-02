@@ -1,0 +1,24 @@
+version: '3.9'
+
+services:
+  xray:
+    image: localhost:8080/box_starting/local_xray:latest
+    environment:
+      - XRAY_SERVER={{XRAY_SERVER}}
+      - XRAY_UUID={{XRAY_UUID}}
+    networks:
+      - xray_net
+    stop_grace_period: 20s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+      update_config:
+        order: start-first
+        delay: 5s
+
+networks:
+  xray_net:
+    driver: overlay
+    attachable: true

@@ -10,14 +10,15 @@ services:
       - DOCKER_PASSWORD={{DOCKER_HUB_PASSWORD}}
       - LOCAL_DOCKER_USERNAME={{LOCAL_DOCKER_USERNAME}}
       - LOCAL_DOCKER_PASSWORD={{LOCAL_DOCKER_PASSWORD}}
-      - HTTP_PROXY=http://172.20.0.1:10809
-      - HTTPS_PROXY=http://172.20.0.1:10809
-      - NO_PROXY=hub.hlwuxi.com,10.236.0.0/16,localhost,127.0.0.1
+      - HTTP_PROXY=http://xray:10809
+      - HTTPS_PROXY=http://xray:10809
+      - NO_PROXY=hub.hlwuxi.com,10.0.0.0/8,localhost,127.0.0.1
     volumes:
       - sync_records:/app/sync_records
       - run_logs:/app/run_logs
     networks:
       - proxy_app
+      - xray_net
     stop_grace_period: 20s
     deploy:
       replicas: 1
@@ -31,6 +32,8 @@ services:
 
 networks:
   proxy_app:
+    external: true
+  xray_net:
     external: true
 
 volumes:
