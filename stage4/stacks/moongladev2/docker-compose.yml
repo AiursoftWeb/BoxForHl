@@ -1,34 +1,88 @@
+version: "3.9"
+
 services:
-  moongladev2:
-    image: hub.hlwuxi.com/aiursoft/moongladev2
+  app:
     depends_on:
       - db
+    image: hub.hlwuxi.com/aiursoft/moongladev2:latest
+    volumes:
+      - moongladev2-aspnet:/data/.aspnet/
+      - moongladev2-files:/data/files
     environment:
-      - ConnectionStrings__MoongladeDatabase=Server=db;Database=moonglade;Uid=root;Pwd=${MYSQL_PASSWORD};OldGuids=true;CharSet=utf8
-      - OIDC__Authority=https://auth.hlwuxi.com/application/o/moongladev2
-      - OIDC__ClientId=${MOONGLADEV2_CLIENT_ID}
-      - OIDC__ClientSecret=${MOONGLADEV2_CLIENT_SECRET}
+      - ConnectionStrings__DefaultConnection=Server=db;Database=moongladev2;Uid=moongladev2;Pwd=<mgv2_password>;
+      - ConnectionStrings__DbType=MySql
+      - Storage__Path=/data/files
+      - AppSettings__AuthProvider=OIDC
+      - AppSettings__OIDC__Authority=https://auth.hlwuxi.com/application/o/moongladev2
+      - AppSettings__OIDC__ClientId={{MOONGLADEV2_CLIENT_ID}}
+      - AppSettings__OIDC__ClientSecret={{MOONGLADEV2_CLIENT_SECRET}}
+      - Logging__Clickhouse__Enabled=true
+      - Logging__Clickhouse__ConnectionString=Host=clickhouse;User=default;Password=123456;Database=AspNetCoreLogs
+      - Logging__Clickhouse__TableName=Moongladev2Logs
     networks:
-      - app
+      - proxy_app
+      - internal
+      - clickhouse_net
+    stop_grace_period: 20s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+      update_config:
+        order: start-first
+        delay: 5s
 
   db:
     image: hub.hlwuxi.com/mysql:9.7.0
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_DATABASE=moonglade
+    command: --skip-log-bin
     volumes:
-      - moonglade_mysql:/var/lib/mysql
+      - moongladev2-db:/var/lib/mysql
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
+      - MYSQL_DATABASE=moongladev2
+      - MYSQL_USER=moongladev2
+      - MYSQL_PASSWORD=<mgv2_password>
     networks:
-      - app
-
-networks:
-  app:
-    external: true
+      - internal
+    stop_grace_period: 60s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+      update_config:
+        order: stop-first
+        delay: 60s
 
 volumes:
-  moonglade_mysql:
+  moongladev2-files:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /swarm-vol/moonglade_mysql
+      device: /swarm-vol/moongladev2-data/files
+  moongladev2-aspnet:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/moongladev2-data/aspnet
+  moongladev2-db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/moongladev2-data/mysql
+
+networks:
+  proxy_app:
+    external: true
+  clickhouse_net:
+    external: true
+  internal:
+    driver: overlay
