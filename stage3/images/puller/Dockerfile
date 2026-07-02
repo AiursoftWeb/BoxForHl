@@ -24,7 +24,7 @@ ENV HTTP_PROXY=${HTTP_PROXY} HTTPS_PROXY=${HTTPS_PROXY}
 #ADD "https://api.github.com/repos/regclient/regclient/commits?per_page=1" latest_commit
 RUN (curl -m 120 --retry 3 -L https://github.com/regclient/regclient/releases/latest/download/regctl-linux-amd64 -o /tmp/regctl-dl || \
     (rm -f /tmp/regctl-dl && curl -m 120 --retry 3 -L https://git.aiursoft.com/PublicVault/regclient/releases/download/mirror/regctl-linux-amd64 -o /tmp/regctl-dl)) && \
-    (file /tmp/regctl-dl | grep -q "ELF" || (echo "ERROR: regctl download is not a valid ELF binary (likely blocked by CDN)"; head -c 200 /tmp/regctl-dl; false)) && \
+    (head -c 4 /tmp/regctl-dl | od -An -tx1 | tr -d ' \n' | grep -q '7f454c46' || (echo "ERROR: regctl download is not a valid ELF binary (likely blocked by CDN)"; head -c 200 /tmp/regctl-dl; false)) && \
     mv /tmp/regctl-dl /usr/local/bin/regctl && \
     chmod 755 /usr/local/bin/regctl
 
