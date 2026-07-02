@@ -9,7 +9,7 @@ services:
       - translate-aspnet:/data/.aspnet/
       - translate-files:/data/files
     environment:
-      - ConnectionStrings__DefaultConnection=Server=db;Database=mth;Uid=mth;Pwd=<mth_password>;
+      - ConnectionStrings__DefaultConnection=Server=db;Database=translate;Uid=translate;Pwd=<translate_password>;
       - ConnectionStrings__DbType=MySql
       - Storage__Path=/data/files
       - AppSettings__AuthProvider=OIDC
@@ -45,9 +45,9 @@ services:
       - translate-db:/var/lib/mysql
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=true
-      - MYSQL_DATABASE=mth
-      - MYSQL_USER=mth
-      - MYSQL_PASSWORD=<mth_password>
+      - MYSQL_DATABASE=translate
+      - MYSQL_USER=translate
+      - MYSQL_PASSWORD=<translate_password>
     networks:
       - internal
     stop_grace_period: 60s

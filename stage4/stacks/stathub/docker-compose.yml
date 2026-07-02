@@ -1,10 +1,10 @@
-version: '3.9'
+version: "3.9"
 
 services:
   app:
     depends_on:
       - db
-    image: hub.hlwuxi.com/aiursoft/stathub
+    image: hub.hlwuxi.com/aiursoft/stathub:latest
     volumes:
       - stathub-aspnet:/data/.aspnet/
       - stathub-files:/data/files
@@ -23,17 +23,17 @@ services:
       - proxy_app
       - internal
       - clickhouse_net
-    stop_grace_period: 60s
+    stop_grace_period: 20s
     deploy:
       labels:
         shepherd.autoupdate: "true"
       resources:
         limits:
-          cpus: '2.0'
-          memory: 4G
+          cpus: "2.0"
+          memory: 2G
       update_config:
-        order: stop-first
-        delay: 60s
+        order: start-first
+        delay: 5s
 
   db:
     image: hub.hlwuxi.com/mysql:9.7.0
