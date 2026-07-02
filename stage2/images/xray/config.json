@@ -41,7 +41,7 @@
                 "network": "ws",
                 "security": "tls",
                 "wsSettings": {
-                    "path": "/"
+                    "path": "/admin"
                 }
             }
         },
