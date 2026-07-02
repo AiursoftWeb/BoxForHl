@@ -20,5 +20,4 @@ services:
 
 networks:
   xray_net:
-    driver: overlay
-    attachable: true
+    external: true
