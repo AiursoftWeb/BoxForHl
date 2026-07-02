@@ -15,6 +15,11 @@ RUN apt-get update && \
 # Copy all scripts in one layer
 COPY entry.sh start.sh source_updated.py /app/
 
+# Proxy for downloading regctl from GitHub (build containers on docker0 bridge)
+ARG HTTP_PROXY=http://172.17.0.1:10809
+ARG HTTPS_PROXY=http://172.17.0.1:10809
+ENV HTTP_PROXY=${HTTP_PROXY} HTTPS_PROXY=${HTTPS_PROXY}
+
 # Avoid cache invalidation for stable layers above, download regctl with freshness check
 #ADD "https://api.github.com/repos/regclient/regclient/commits?per_page=1" latest_commit
 RUN (curl -m 120 --retry 3 -L https://github.com/regclient/regclient/releases/latest/download/regctl-linux-amd64 -o /tmp/regctl-dl || \
