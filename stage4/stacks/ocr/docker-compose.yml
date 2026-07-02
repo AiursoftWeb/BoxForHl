@@ -3,15 +3,21 @@ version: '3.9'
 services:
   app:
     image: localhost:8080/box_starting/local_paddleocr:latest
-    volumes:
-      - type: tmpfs
-        target: /dev/shm
     environment:
       - OCR_ACCESS_TOKEN={{OCR_ACCESS_TOKEN}}
       - USE_GPU=true
+      - HTTP_PROXY=http://xray:10809
+      - HTTPS_PROXY=http://xray:10809
+      - NO_PROXY=10.0.0.0/8,localhost,127.0.0.1
+    volumes:
+      - type: tmpfs
+        target: /dev/shm
+      - paddleocr-venv:/opt/venv
+      - paddleocr-cache:/root/.cache
     networks:
       - proxy_app
       - internal
+      - xray_net
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
       interval: 30s
@@ -30,8 +36,24 @@ services:
         order: start-first
         delay: 5s
 
+volumes:
+  paddleocr-venv:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/ocr-data/venv
+  paddleocr-cache:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /swarm-vol/ocr-data/cache
+
 networks:
   proxy_app:
     external: true
   internal:
     driver: overlay
+  xray_net:
+    external: true

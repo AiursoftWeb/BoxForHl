@@ -649,7 +649,7 @@ print_warn "====================================================================
 sleep 3
 
 print_ok "Building local paddleocr..."
-sudo docker build --network=host ./stage4/images/paddleocr -t localhost:8080/box_starting/local_paddleocr:latest
+sudo docker build ./stage4/images/paddleocr -t localhost:8080/box_starting/local_paddleocr:latest
 sudo docker push localhost:8080/box_starting/local_paddleocr:latest
 
 print_ok "Ensuring binfmt support for multi-arch builds..."
