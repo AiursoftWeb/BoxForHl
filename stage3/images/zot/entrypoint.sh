@@ -11,7 +11,7 @@ if [ ! -f "$ZOT_BIN" ]; then
         "https://github.com/project-zot/zot/releases/download/${ZOT_VERSION}/zot-linux-amd64" \
         "https://ghproxy.com/https://github.com/project-zot/zot/releases/download/${ZOT_VERSION}/zot-linux-amd64" \
     ; do
-        if wget -q --timeout=120 --tries=3 -O "$ZOT_BIN" "$url" 2>/dev/null; then
+        if wget --show-progress --timeout=120 --tries=3 -O "$ZOT_BIN" "$url"; then
             break
         fi
         echo "Download from $url failed, trying next..."

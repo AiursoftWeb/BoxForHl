@@ -7,7 +7,7 @@ if [ ! -f /usr/bin/frpc ]; then
     latestUrl=$(curl -s https://api.github.com/repos/fatedier/frp/releases/latest \
         | jq -r '(.assets[] | select(.browser_download_url | contains("linux_amd64"))).browser_download_url')
     echo "Downloading: $latestUrl"
-    wget -q -O /tmp/frp.tar.gz "$latestUrl"
+    wget --show-progress -O /tmp/frp.tar.gz "$latestUrl"
     mkdir -p /tmp/frp_extract
     tar -zxf /tmp/frp.tar.gz --directory /tmp/frp_extract
     frpcPath=$(find /tmp/frp_extract/ -name "frpc")

@@ -12,7 +12,7 @@ for url in \
     "https://github.com/regclient/regclient/releases/latest/download/regctl-linux-amd64" \
     "https://git.aiursoft.com/PublicVault/regclient/releases/download/mirror/regctl-linux-amd64" \
 ; do
-    if curl -m 120 --retry 3 -L "$url" -o /tmp/regctl-dl 2>/dev/null; then
+    if curl -m 120 --retry 3 --progress-bar -L "$url" -o /tmp/regctl-dl; then
         break
     fi
     echo "Download from $url failed, trying next..."
