@@ -17,8 +17,8 @@ PIP_PACKAGES=(
 
 # ── Install uv ──────────────────────────────────────────────
 if ! command -v uv &>/dev/null; then
-    echo "uv not found. Installing..."
-    curl -LsSf https://astral.sh/uv/install.sh | sh
+    echo "uv not found. Installing via pip..."
+    pip install uv
 fi
 export PATH="/root/.local/bin:${PATH}"
 
