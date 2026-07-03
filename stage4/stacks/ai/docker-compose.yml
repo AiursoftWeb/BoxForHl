@@ -106,53 +106,8 @@ services:
         order: stop-first
         delay: 60s
 
-  code-runner:
-    image: hub.hlwuxi.com/aiursoft/cpprunner
-    volumes:
-      - code-runner-aspnet-data:/data/.aspnet
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /tmp:/tmp
-    environment:
-      - DockerImageSettings__Prefix=hub.hlwuxi.com
-    networks:
-      - internal
-    stop_grace_period: 20s
-    deploy:
-      labels:
-        shepherd.autoupdate: "true"
-      replicas: 2
-      resources:
-        limits:
-          cpus: '4.0'
-          memory: 4G
-      update_config:
-        order: start-first
-        delay: 5s
-
-  mcpo:
-    depends_on:
-      - code-runner
-    image: hub.hlwuxi.com/ghcr.io/open-webui/mcpo:main
-    networks:
-      - internal
-    volumes:
-      - mcpo-data:/data
-    stop_grace_period: 20s
-    deploy:
-      labels:
-        shepherd.autoupdate: "true"
-      resources:
-        limits:
-          cpus: '6.0'
-          memory: 6G
-      update_config:
-        order: start-first
-        delay: 5s
-    entrypoint: ["mcpo", "--config", "/data/config.json"]
-
   open-webui:
     depends_on:
-      - mcpo
       - ollama-gateway-app
     image: hub.hlwuxi.com/ghcr.io/open-webui/open-webui:main
     environment:
@@ -222,18 +177,6 @@ volumes:
       type: none
       o: bind
       device: /swarm-vol/ai/ollama/data
-  code-runner-aspnet-data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /swarm-vol/ai/code-runner/aspnet
-  mcpo-data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /swarm-vol/ai/mcpo
   open-webui-data:
     driver: local
     driver_opts:
