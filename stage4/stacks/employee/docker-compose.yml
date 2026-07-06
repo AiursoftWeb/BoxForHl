@@ -17,7 +17,9 @@ services:
       - AppSettings__OIDC__Authority=https://auth.hlwuxi.com/application/o/employeecenter
       - AppSettings__OIDC__ClientId={{EPEC_CLIENT_ID}}
       - AppSettings__OIDC__ClientSecret={{EPEC_CLIENT_SECRET}}
-      - AppSettings__OCR__Enabled=false
+      - AppSettings__OCR__Enabled=true
+      - AppSettings__OCR__Endpoint=https://ocr.hlwuxi.com/api/ocr/pdf
+      - AppSettings__OCR__BearerToken={{OCR_ACCESS_TOKEN}}
       - AppSettings__ExportPath=/export
       - AppSettings__Agent__Endpoint=http://agent:8000/ask
       - Logging__Clickhouse__Enabled=true
