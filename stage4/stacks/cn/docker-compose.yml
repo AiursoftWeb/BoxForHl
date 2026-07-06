@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  app:
+    image: hub.hlwuxi.com/aiursoft/marktohtml:latest
+    networks:
+      - proxy_app
+    stop_grace_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+
+networks:
+  proxy_app:
+    external: true
