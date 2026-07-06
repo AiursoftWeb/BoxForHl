@@ -10,23 +10,15 @@ PIP_PACKAGES=(
     python-multipart
     opencv-python-headless
     loguru
-    setuptools
     requests
     pymupdf
 )
 
-# ── Install uv ──────────────────────────────────────────────
-if ! command -v uv &>/dev/null; then
-    echo "uv not found. Installing via pip..."
-    pip install uv
-fi
-export PATH="/root/.local/bin:${PATH}"
-
-# ── Install pip packages into persistent venv ───────────────
+# ── Install pip packages into persistent venv ──
 if [ ! -f "$VENV_DIR/bin/python" ]; then
     echo "Creating virtual environment and installing packages..."
-    uv venv "$VENV_DIR"
-    uv pip install --python "$VENV_DIR/bin/python" "${PIP_PACKAGES[@]}"
+    python3 -m venv "$VENV_DIR"
+    "$VENV_DIR/bin/pip" install "${PIP_PACKAGES[@]}"
 
     echo "Warming up PaddleOCR model..."
     "$VENV_DIR/bin/python" -c "
