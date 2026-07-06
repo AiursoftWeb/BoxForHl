@@ -18,13 +18,13 @@ PIP_PACKAGES=(
 # ── Install uv and Python 3.12 (paddlepaddle requires Python <= 3.13) ──
 if ! command -v uv &>/dev/null; then
     echo "Installing uv..."
-    pip install uv 2>&1 | tail -1
+    pip install uv
 fi
 export PATH="/root/.local/bin:${PATH}"
 
 if ! uv python find 3.12 &>/dev/null; then
     echo "Installing Python 3.12..."
-    uv python install 3.12 2>&1 | tail -2
+    uv python install 3.12
 fi
 
 # ── Install pip packages into persistent venv ──
