@@ -1,6 +1,6 @@
 {
 	# Email for Let's Encrypt notifications (certificate expiration, etc.)
-	email clare.xu@hlwuxi.com
+	email hlwx@hlwuxi.com
 	
 	log {
 		format json
@@ -10,6 +10,14 @@
 			roll_uncompressed
 		}
 		level info
+	}
+	servers :80 {
+		listener_wrappers {
+			proxy_protocol {
+				timeout 2s
+				allow 10.0.0.0/8
+			}
+		}
 	}
 	servers :443 {
 		listener_wrappers {
