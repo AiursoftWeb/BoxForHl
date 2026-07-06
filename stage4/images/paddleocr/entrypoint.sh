@@ -10,15 +10,30 @@ PIP_PACKAGES=(
     python-multipart
     opencv-python-headless
     loguru
+    setuptools
     requests
     pymupdf
 )
 
+# ── Install uv and Python 3.12 (paddlepaddle requires Python <= 3.13) ──
+if ! command -v uv &>/dev/null; then
+    echo "Installing uv..."
+    pip install uv 2>&1 | tail -1
+fi
+export PATH="/root/.local/bin:${PATH}"
+
+if ! uv python find 3.12 &>/dev/null; then
+    echo "Installing Python 3.12..."
+    uv python install 3.12 2>&1 | tail -2
+fi
+
 # ── Install pip packages into persistent venv ──
 if [ ! -f "$VENV_DIR/bin/python" ]; then
-    echo "Creating virtual environment and installing packages..."
-    python3 -m venv "$VENV_DIR"
-    "$VENV_DIR/bin/pip" install "${PIP_PACKAGES[@]}"
+    echo "Creating virtual environment with Python 3.12..."
+    uv venv --python 3.12 "$VENV_DIR"
+
+    echo "Installing packages..."
+    uv pip install --python "$VENV_DIR/bin/python" "${PIP_PACKAGES[@]}"
 
     echo "Warming up PaddleOCR model..."
     "$VENV_DIR/bin/python" -c "
