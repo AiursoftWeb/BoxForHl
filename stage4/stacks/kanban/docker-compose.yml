@@ -41,7 +41,7 @@ services:
         delay: 5s
 
   markitdown:
-    image: pubhub.aiursoft.com/aiursoft/markitdown:latest
+    image: hub.hlwuxi.com/aiursoft/markitdown:latest
     networks:
       - markitdown
     stop_grace_period: 20s
