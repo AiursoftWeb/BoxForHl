@@ -302,6 +302,7 @@ images=(
     # Employee Center
     "aiursoft/employeecenter"
     "aiursoft/folderagent"
+    "aiursoft/markitdown"
     # Grafana
     "grafana/grafana"
     "prom/prometheus"
