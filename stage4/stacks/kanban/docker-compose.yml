@@ -17,6 +17,7 @@ services:
       - AppSettings__OIDC__ClientId={{KANBAN_CLIENT_ID}}
       - AppSettings__OIDC__ClientSecret={{KANBAN_CLIENT_SECRET}}
       - AppSettings__Anthropic__Token={{KANBAN_ANTHROPIC_API_KEY}}
+      - AppSettings__MarkItDown__Endpoint=http://markitdown:8000/api/convert
       - AppSettings__Anthropic__CompletionApiUrl=https://ollama.hlwuxi.com/v1/messages/
       - AppSettings__Anthropic__Model=aiursoft-instruct:latest
       - Logging__Clickhouse__Enabled=true
@@ -26,6 +27,23 @@ services:
       - proxy_app
       - internal
       - clickhouse_net
+      - markitdown
+    stop_grace_period: 20s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+      update_config:
+        order: start-first
+        delay: 5s
+
+  markitdown:
+    image: pubhub.aiursoft.com/aiursoft/markitdown:latest
+    networks:
+      - markitdown
     stop_grace_period: 20s
     deploy:
       labels:
@@ -88,4 +106,6 @@ networks:
   clickhouse_net:
     external: true
   internal:
+    driver: overlay
+  markitdown:
     driver: overlay
