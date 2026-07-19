@@ -583,6 +583,9 @@ sudo docker push localhost:8080/box_starting/local_pysyncer:latest
 print_ok "Building local frp..."
 sudo docker build ./stage2/images/frp         -t localhost:8080/box_starting/local_frp:latest
 sudo docker push localhost:8080/box_starting/local_frp:latest
+print_ok "Building local frp-monitor..."
+sudo docker build ./stage2/images/frp-monitor -t localhost:8080/box_starting/local_frp_monitor:latest
+sudo docker push localhost:8080/box_starting/local_frp_monitor:latest
 print_ok "Building local xray..."
 sudo docker build ./stage2/images/xray -t localhost:8080/box_starting/local_xray:latest
 sudo docker push localhost:8080/box_starting/local_xray:latest
