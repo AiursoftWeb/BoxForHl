@@ -16,7 +16,6 @@ services:
       - AppSettings__OIDC__Authority=https://auth.hlwuxi.com/application/o/kanban
       - AppSettings__OIDC__ClientId={{KANBAN_CLIENT_ID}}
       - AppSettings__OIDC__ClientSecret={{KANBAN_CLIENT_SECRET}}
-      - AppSettings__Anthropic__Token={{KANBAN_ANTHROPIC_API_KEY}}
       - AppSettings__MarkItDown__Endpoint=http://markitdown:8000/api/convert
       - AppSettings__Anthropic__CompletionApiUrl=https://ollama.hlwuxi.com/v1/messages/
       - AppSettings__Anthropic__Model=aiursoft-instruct:latest
