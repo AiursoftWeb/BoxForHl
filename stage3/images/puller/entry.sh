@@ -300,9 +300,11 @@ images=(
     # ClickHouse
     "clickhouse/clickhouse-server"
     # Employee Center
+    "aiursoft/asr-api"
     "aiursoft/employeecenter"
     "aiursoft/folderagent"
     "aiursoft/markitdown"
+    "aiursoft/whisperx"
     # Grafana
     "grafana/grafana"
     "prom/prometheus"
