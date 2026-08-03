@@ -20,6 +20,15 @@ services:
       - AppSettings__OCR__Enabled=true
       - AppSettings__OCR__Endpoint=https://ocr.hlwuxi.com/api/ocr/pdf
       - AppSettings__OCR__BearerToken={{OCR_ACCESS_TOKEN}}
+      - AppSettings__ASR__Enabled=true
+      - AppSettings__ASR__Endpoint=http://asr-api:8080/v1/audio/transcriptions
+      - AppSettings__ASR__BearerToken={{ASR_API_TOKEN}}
+      - AppSettings__ASR__Model=whisperx
+      - AppSettings__ASR__Level=large-v3
+      - AppSettings__ASR__Language=
+      - AppSettings__ASR__TimeoutSeconds=1800
+      - AppSettings__ASR__AsrMaxRetryCount=30
+      - AppSettings__ASR__AsrMaxEmptyRetryCount=10
       - AppSettings__ExportPath=/export
       - AppSettings__Agent__Endpoint=http://agent:8000/ask
       - Logging__Clickhouse__Enabled=true
@@ -64,6 +73,51 @@ services:
       update_config:
         order: start-first
         delay: 5s
+
+  asr-api:
+    image: hub.hlwuxi.com/aiursoft/asr-api:latest
+    environment:
+      - ASR_API_TOKEN={{ASR_API_TOKEN}}
+      - ASR_ENABLE_WHISPERX=true
+      - ASR_ENABLE_FUNASR=false
+      - ASR_ENABLE_FUNASR_REALTIME=false
+      - ASR_WHISPERX_TOKEN={{ASR_WHISPERX_TOKEN}}
+      - ASR_WHISPERX_URL=http://whisperx:8000
+      - ASR_WHISPERX_SINGLE_MODEL=true
+    networks:
+      - internal
+    stop_grace_period: 20s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+      update_config:
+        order: start-first
+        delay: 5s
+
+  whisperx:
+    image: hub.hlwuxi.com/aiursoft/whisperx:latest
+    environment:
+      - ASR_WHISPERX_TOKEN={{ASR_WHISPERX_TOKEN}}
+      - WHISPERX_MODEL=large-v3
+      - WHISPERX_DEVICE=cuda
+      - WHISPERX_COMPUTE_TYPE=float16
+    networks:
+      - internal
+    stop_grace_period: 60s
+    deploy:
+      labels:
+        shepherd.autoupdate: "true"
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 16G
+      update_config:
+        order: stop-first
+        delay: 60s
 
   db:
     image: hub.hlwuxi.com/mysql:9.7.0
