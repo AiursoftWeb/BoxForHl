@@ -8,12 +8,20 @@ ARG ZOT_SHA256
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends wget ca-certificates curl \
+    && apt-get install -y --no-install-recommends aria2 ca-certificates curl \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /etc/zot /config /data
 
-RUN wget -O /usr/local/bin/zot "https://pub.aiursoft.com/zot" \
+RUN aria2c \
+        --allow-overwrite=true \
+        --auto-file-renaming=false \
+        --max-connection-per-server=16 \
+        --split=16 \
+        --min-split-size=1M \
+        --dir=/usr/local/bin \
+        --out=zot \
+        "https://pub.aiursoft.com/zot" \
     && echo "${ZOT_SHA256}  /usr/local/bin/zot" | sha256sum -c - \
     && chmod +x /usr/local/bin/zot \
     && /usr/local/bin/zot --version 2>&1 | grep -q "\"commit\":\"${ZOT_VERSION}-"
