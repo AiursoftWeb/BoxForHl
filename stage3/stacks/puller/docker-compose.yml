@@ -6,10 +6,10 @@ services:
     image: localhost:8080/box_starting/local_puller
     environment:
       - MIRROR_TARGET=hub.hlwuxi.com
-      - DOCKER_USERNAME={{DOCKER_HUB_USERNAME}}
-      - DOCKER_PASSWORD={{DOCKER_HUB_PASSWORD}}
-      - LOCAL_DOCKER_USERNAME={{LOCAL_DOCKER_USERNAME}}
-      - LOCAL_DOCKER_PASSWORD={{LOCAL_DOCKER_PASSWORD}}
+      - DOCKER_USERNAME={{PUBLIC_DOCKER_HUB_USERNAME}}
+      - DOCKER_PASSWORD={{PUBLIC_DOCKER_HUB_PASSWORD}}
+      - DOCKERHUB_USERNAME={{DOCKERHUB_USERNAME}}
+      - DOCKERHUB_PASSWORD={{DOCKERHUB_PASSWORD}}
       - HTTP_PROXY=http://xray:10809
       - HTTPS_PROXY=http://xray:10809
       - NO_PROXY=hub.hlwuxi.com,10.0.0.0/8,localhost,127.0.0.1
