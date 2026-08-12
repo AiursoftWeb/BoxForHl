@@ -3,16 +3,11 @@ version: '3.9'
 services:
   server:
     image: localhost:8080/box_starting/local_zot
-    environment:
-      - HTTP_PROXY=http://xray:10809
-      - HTTPS_PROXY=http://xray:10809
-      - NO_PROXY=hub.hlwuxi.com,10.0.0.0/8,localhost,127.0.0.1
     volumes:
       - zot-blob:/data
       - zot-config:/config
     networks:
       - proxy_app
-      - xray_net
     stop_grace_period: 60s
     deploy:
       resources:
@@ -39,6 +34,4 @@ volumes:
 
 networks:
   proxy_app:
-    external: true
-  xray_net:
     external: true

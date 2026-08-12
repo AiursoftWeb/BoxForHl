@@ -1,5 +1,10 @@
+# The version need to be updated regularly.
+ARG ZOT_VERSION=v2.1.20
+ARG ZOT_SHA256=a32e42d042d1f17b5b1317e55cc1a415a744c873dcd05c25c56b665478258bcb
 FROM localhost:8080/box_starting/local_ubuntu
 
+ARG ZOT_VERSION
+ARG ZOT_SHA256
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
@@ -7,6 +12,11 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /etc/zot /config /data
+
+RUN wget -O /usr/local/bin/zot "https://pub.aiursoft.com/zot" \
+    && echo "${ZOT_SHA256}  /usr/local/bin/zot" | sha256sum -c - \
+    && chmod +x /usr/local/bin/zot \
+    && /usr/local/bin/zot --version 2>&1 | grep -q "\"commit\":\"${ZOT_VERSION}-"
 
 COPY default-config.json /etc/zot/default-config.json
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
