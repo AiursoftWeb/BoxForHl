@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-ZOT_VERSION="v2.1.13"
+ZOT_VERSION="v2.1.20"
 ZOT_BIN="/config/zot"
 
 # Download zot binary on first run, or if existing binary is broken
