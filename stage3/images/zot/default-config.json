@@ -43,7 +43,7 @@
                 }
             },
             "adminPolicy": {
-                "users": ["clare.xu@hlwuxi.com"],
+                "users": ["anduin@aiursoft.com"],
                 "actions": ["read", "create", "update", "delete"]
             }
         },
