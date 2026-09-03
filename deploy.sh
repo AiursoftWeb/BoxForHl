@@ -229,7 +229,7 @@ set -euo pipefail
 
 TRIGGER_MB=512000
 SAFE_MB=460800
-DOCKER_DIR="/var/lib/docker"
+DOCKER_DIR="/swarm-vol/docker-data"
 MOTD_FILE="/etc/motd"
 WARN_MSG="[CRITICAL] Docker disk usage is extremely high (>450GB). Please check."
 
@@ -276,10 +276,10 @@ EOF
 [Unit]
 Description=Check Docker disk usage and prune if necessary
 After=docker.service
-Requires=docker.service
 
 [Service]
 Type=oneshot
+ExecCondition=/usr/bin/systemctl is-active --quiet docker.service
 ExecStart=$MONITOR_PATH
 User=root
 EOF
