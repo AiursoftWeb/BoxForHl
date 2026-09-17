@@ -57,6 +57,11 @@ services:
         sleep 120;
         echo "Setting OIDC as the default login method";
         docker ps --filter name=nextcloud_web -q | xargs -r -I {} docker exec -u www-data {} /usr/local/bin/php occ config:app:set --type=string --value=0 user_oidc allow_multiple_user_backends;
+        echo "Ensuring Nextcloud audit logging is enabled";
+        docker ps --filter name=nextcloud_web -q | xargs -r -I {} docker exec -u www-data {} /usr/local/bin/php occ app:enable admin_audit;
+        docker ps --filter name=nextcloud_web -q | xargs -r -I {} docker exec -u www-data {} /usr/local/bin/php occ config:system:set log.condition apps 0 --type=string --value=admin_audit;
+        docker ps --filter name=nextcloud_web -q | xargs -r -I {} docker exec -u www-data {} /usr/local/bin/php occ config:system:set log_type_audit --type=string --value=file;
+        docker ps --filter name=nextcloud_web -q | xargs -r -I {} docker exec -u www-data {} /usr/local/bin/php occ config:system:set logfile_audit --type=string --value=/mnt/data/audit.log;
         # Avoid upgrade here because it may mess up the instance.
         # echo "Upgrading nextcloud";
         # docker ps --filter name=nextcloud_web -q | xargs -r -I {} docker exec -u www-data {} /usr/local/bin/php occ upgrade;

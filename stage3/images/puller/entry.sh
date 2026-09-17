@@ -306,7 +306,9 @@ images=(
     "aiursoft/markitdown"
     "aiursoft/whisperx"
     # Grafana
+    "grafana/alloy:v1.19.2"
     "grafana/grafana"
+    "grafana/loki:3.7.2"
     "prom/prometheus"
     # Kanban
     "aiursoft/kanban"
