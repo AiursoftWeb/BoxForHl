@@ -13,7 +13,8 @@ mirror_image() {
     echo "Mirroring image: $image"
     sudo docker pull --platform "$platform" "$source"
     platform_digest="$(
-        sudo docker manifest inspect --verbose "$source" |
+        sudo env HTTPS_PROXY=http://127.0.0.1:10809 \
+            docker manifest inspect --verbose "$source" |
             jq -er --arg os "$platform_os" --arg arch "$platform_arch" '
                 if type == "array" then
                     first(.[] | select(
