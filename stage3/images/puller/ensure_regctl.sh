@@ -12,7 +12,13 @@ for url in \
     "https://github.com/regclient/regclient/releases/latest/download/regctl-linux-amd64" \
     "https://git.aiursoft.com/PublicVault/regclient/releases/download/mirror/regctl-linux-amd64" \
 ; do
-    if curl -m 120 --retry 3 --progress-bar -L "$url" -o /tmp/regctl-dl; then
+    # Hl downloads at startup through Xray, unlike the company Boxes' build-time download.
+    # On 2026-10-16, the proxy worked but a 1 MiB probe took 29s for a ~13 MB release.
+    # A 120s total deadline repeatedly discarded progress; allow slow transfers to finish.
+    # Bound connection, stalled-transfer and total time separately; reject HTTP error pages.
+    if curl --fail --connect-timeout 30 --max-time 1800 \
+        --speed-limit 1024 --speed-time 120 \
+        --retry 3 --progress-bar --location "$url" -o /tmp/regctl-dl; then
         break
     fi
     echo "Download from $url failed, trying next..."
