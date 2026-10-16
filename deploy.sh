@@ -127,9 +127,18 @@ function login_to_hub() {
     fi
     unset hub_password
 
+    local -a manifest_env=()
+    # Hl's customer network requires this exception to the shared Box login flow.
+    # On 2026-10-16, gateway DNS returned incorrect Docker Hub addresses; direct CLI access timed out.
+    # The daemon proxy covers login/pull, but manifest inspect uses the CLI's own environment.
+    # The same manifest command succeeded with this proxy; keep the customer registry direct.
+    if [[ "$registry_host" == "docker.io" ]]; then
+        manifest_env=(HTTPS_PROXY=http://127.0.0.1:10809)
+    fi
+
     print_ok "Verifying access to $registry_host/$verification_image..."
-    if ! sudo docker manifest inspect "$registry_host/$verification_image" >/dev/null; then
-        print_error "Registry login succeeded, but the configured account cannot read $registry_host/$verification_image."
+    if ! sudo env "${manifest_env[@]}" docker manifest inspect "$registry_host/$verification_image" >/dev/null; then
+        print_error "Registry login succeeded, but querying $registry_host/$verification_image failed. Check the error above for connectivity or access issues."
         exit 1
     fi
 }
