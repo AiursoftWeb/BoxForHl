@@ -1,17 +1,18 @@
 # BoxForHlart ⚙️
 
-**Role:** Hlart Node Management & Service Hosting
+**Role:** Customer-owned Hlart node, with code and operations maintained by Aiursoft
 
-This repository contains the configuration and deployment logic for the **Hlart Server** of the Aiursoft Hybrid Cloud.
+This repository contains the configuration and deployment logic for the **Hlart Server**. The customer owns the server; Aiursoft currently maintains its code and operations. It is an independent customer deployment, not an Aiursoft-owned node.
 
 ## 🎯 Strategic Objective
-To provide a self-contained, high-performance environment for hosting services on the Hlart server, with full integration for FRP, Authentik, and Vikunja.
+To provide a self-contained, high-performance environment for hosting services on the Hlart server, with customer-local FRP, Authentik, and application services.
 
 ## 🏗 Architecture Specifics
 *   **Infrastructure:** Built on top of the Aiursoft Box project architecture.
 *   **Network:** Uses FRP for tunneling and Caddy for domain management.
-*   **Authentication:** Fully integrated with Authentik for centralized identity management.
-*   **Services:** Currently hosts Vikunja as the primary task management platform.
+*   **Authentication:** Uses the customer's Authentik at `auth.hlwuxi.com`.
+*   **Services:** Hosts EmployeeCenter, Kanban, Nextcloud, AI services, and other stacks declared under `stage4/stacks`.
+*   **Images:** Business services use `hub.hlwuxi.com`. The local Puller reads public registries through Xray; it does not use `hub.aiursoft.cn`.
 *   **Domains:** All services are hosted under the `hlwuxi.com` domain.
 
 ## 📦 Stacks Included
@@ -19,7 +20,7 @@ To provide a self-contained, high-performance environment for hosting services o
 *   **Stage 1:** Image Mirroring for essential services.
 *   **Stage 2:** Network infrastructure (Caddy, FRP, PySyncer).
 *   **Stage 3:** Advanced registries and Identity management (Zot, Puller, Authentik).
-*   **Stage 4:** Business applications (Vikunja, StatHub, Tracer, etc.).
+*   **Stage 4:** Business applications (EmployeeCenter, Kanban, StatHub, Tracer, etc.).
 
 ## 🚀 Deployment
 Run `./deploy.sh` to start the deployment process. Ensure your `.env` file is properly configured.
@@ -824,14 +825,18 @@ When adding a new business service, follow this checklist in order:
 
 ---
 
-## TODO
+## Historical Domain Notes
+
+The lists below are historical planning notes, not a live service inventory. Use the tracked stacks and runtime checks for current state.
+
+### TODO
 
 marktohtml.hlwuxi.com
 vault.hlwuxi.com
 minio.hlwuxi.com
 litellm.hlwuxi.com
 
-## Done
+### Done
 
 nextcloud.hlwuxi.com
 uptime.hlwuxi.com
