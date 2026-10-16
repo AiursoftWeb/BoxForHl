@@ -133,6 +133,7 @@ services:
       - 'OPENID_PROVIDER_URL=https://auth.hlwuxi.com/application/o/openwebchat/.well-known/openid-configuration'
       - OAUTH_CLIENT_ID={{OPENWEB_CLIENT_ID}}
       - OAUTH_CLIENT_SECRET={{OPENWEB_CLIENT_SECRET}}
+      - WEBUI_SECRET_KEY={{WEBUI_SECRET_KEY}}
       - 'OAUTH_SCOPES=openid email profile'
       - OPENID_REDIRECT_URI=https://openweb.hlwuxi.com/oauth/oidc/callback
       - OAUTH_UPDATE_NAME_ON_LOGIN=True
