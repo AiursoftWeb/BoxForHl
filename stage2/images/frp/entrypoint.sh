@@ -7,7 +7,9 @@ if [ ! -f /usr/bin/frpc ]; then
     latestUrl=$(curl -s https://api.github.com/repos/fatedier/frp/releases/latest \
         | jq -r '(.assets[] | select(.browser_download_url | contains("linux_amd64"))).browser_download_url')
     echo "Downloading: $latestUrl"
-    wget --show-progress -O /tmp/frp.tar.gz "$latestUrl"
+    # Use curl here too so HTTPS_PROXY also applies to the binary download.
+    curl --fail --location --retry 3 --connect-timeout 15 --max-time 1800 \
+        --output /tmp/frp.tar.gz "$latestUrl"
     mkdir -p /tmp/frp_extract
     tar -zxf /tmp/frp.tar.gz --directory /tmp/frp_extract
     frpcPath=$(find /tmp/frp_extract/ -name "frpc")
