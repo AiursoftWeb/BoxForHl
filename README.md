@@ -25,6 +25,24 @@ To provide a self-contained, high-performance environment for hosting services o
 ## 🚀 Deployment
 Run `./deploy.sh` to start the deployment process. Ensure your `.env` file is properly configured.
 
+## FRP transport deployment
+
+The Box FRP client uses QUIC on UDP port 9700. Before deploying this client,
+configure the gateway's FRPS with the top-level setting `quicBindPort = 9700`
+and allow UDP 9700 through its firewall. Keep the existing TCP/KCP listeners
+on port 7000 available for rollback and any other clients sharing the gateway.
+The gateway configuration is managed separately from this repository; verify
+its configuration source and apply the server change first during a maintenance
+window. A gateway restart can briefly interrupt its other clients as well.
+
+The transport change affects the Box HTTP and HTTPS proxies. Existing per-proxy
+bandwidth limits, compression and PROXY protocol settings are retained.
+After deployment, check the customer websites, complete transfers and interactive
+latency while the uplink is busy. Keep an independent management connection
+available during the change. To roll back, revert the client change through a
+reviewed PR and the normal deployment process, restoring
+`transport.protocol = "kcp"` and `serverPort = 7000`.
+
 ---
 
 ## 📐 Authoring Paradigms
