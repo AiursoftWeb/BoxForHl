@@ -105,6 +105,9 @@ must_login_local_registry() {
     fi
 
     "$REGCTL_BIN" registry login "${MIRROR_TARGET}" -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_PASSWORD" > /dev/null 2>&1
+    # Buffer large blobs in 1 MiB chunks so source stalls occur between uploads,
+    # rather than inside a request subject to Caddy's body read-idle timeout.
+    "$REGCTL_BIN" registry set "${MIRROR_TARGET}" --blob-max 1048576 --blob-chunk 1048576
     log_success "Successfully authenticated to ${MIRROR_TARGET}"
 }
 
