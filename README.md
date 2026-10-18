@@ -27,21 +27,19 @@ Run `./deploy.sh` to start the deployment process. Ensure your `.env` file is pr
 
 ## FRP transport deployment
 
-The Box FRP client uses QUIC on UDP port 9700. Before deploying this client,
-configure the gateway's FRPS with the top-level setting `quicBindPort = 9700`
-and allow UDP 9700 through its firewall. Keep the existing TCP/KCP listeners
-on port 7000 available for rollback and any other clients sharing the gateway.
-The gateway configuration is managed separately from this repository; verify
-its configuration source and apply the server change first during a maintenance
-window. A gateway restart can briefly interrupt its other clients as well.
+The Box HTTP/HTTPS client uses KCP on UDP port 7000 for throughput validation.
+Verify that the gateway's existing `kcpBindPort = 7000` listener is available;
+keep its TCP/KCP 7000 and QUIC 9700 listeners running without a gateway restart.
+The host's separate systemd FRP client provides SSH through gateway port 2222.
+Preserve that client, its configuration and the SSH mapping during this change.
 
 The transport change affects the Box HTTP and HTTPS proxies. Existing per-proxy
-bandwidth limits, compression and PROXY protocol settings are retained.
+bandwidth limits, TLS, compression and PROXY protocol settings are retained.
 After deployment, check the customer websites, complete transfers and interactive
 latency while the uplink is busy. Keep an independent management connection
 available during the change. To roll back, revert the client change through a
 reviewed PR and the normal deployment process, restoring
-`transport.protocol = "kcp"` and `serverPort = 7000`.
+`transport.protocol = "quic"` and `serverPort = 9700`.
 
 ---
 
