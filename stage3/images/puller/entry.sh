@@ -284,6 +284,7 @@ images=(
     "prom/prometheus"
     # Kanban
     "aiursoft/kanban"
+    "aiursoft/http_error_alert_center_bridge"
     # MarkToHTML
     "aiursoft/marktohtml"
     # MoongladeV2
