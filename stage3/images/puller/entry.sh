@@ -289,7 +289,7 @@ images=(
     # MoongladeV2
     "aiursoft/moongladev2"
     # Nextcloud
-    "nextcloud:32.0.5"
+    "nextcloud:32.0.15-apache"
     # StatHub
     "aiursoft/stathub"
     # Tracer
