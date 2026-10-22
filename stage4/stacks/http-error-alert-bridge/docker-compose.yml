@@ -5,27 +5,7 @@ services:
     image: hub.hlwuxi.com/aiursoft/http_error_alert_center_bridge:latest
     environment:
       - SERVER_NAME=hlart
-      - >-
-        MONITORED_HOSTS=auth.hlwuxi.com,
-        clickhouse.hlwuxi.com,
-        cn.aiursoft.com,
-        employee.hlwuxi.com,
-        grafana.hlwuxi.com,
-        hub.hlwuxi.com,
-        kanban.hlwuxi.com,
-        marktohtml.hlwuxi.com,
-        news.hlwuxi.com,
-        nextcloud.hlwuxi.com,
-        ocr.hlwuxi.com,
-        ollama.hlwuxi.com,
-        openweb.hlwuxi.com,
-        stathub.hlwuxi.com,
-        test.hlwuxi.com,
-        tracer.hlwuxi.com,
-        translate.hlwuxi.com,
-        uptime.hlwuxi.com,
-        vault.hlwuxi.com,
-        warp.hlwuxi.com
+      - MONITORED_HOSTS=*
       - CLICKHOUSE_CONNECTION_STRING=Host=clickhouse_clickhouse;Protocol=http;Port=8123;Database=logs;User=default;Password=123456
       - ALERTCENTER_URL=https://alertcenter.aiursoft.com
       - ALERTCENTER_API_KEY={{HTTP_ERROR_ALERTCENTER_API_KEY}}
