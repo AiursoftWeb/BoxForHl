@@ -291,6 +291,7 @@ images=(
     "aiursoft/moongladev2"
     # Nextcloud
     "nextcloud:32.0.15-apache"
+    "nextcloud:33.0.10-apache"
     # StatHub
     "aiursoft/stathub"
     # Tracer
