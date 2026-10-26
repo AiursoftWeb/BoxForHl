@@ -55,7 +55,7 @@ echo "Mirroring Redis..."
 mirror_image "redis:alpine"
 
 echo "Mirroring GoAuthentik server..."
-mirror_image "ghcr.io/goauthentik/server:2026.5.3"
+mirror_image "ghcr.io/goauthentik/server:2026.5.8"
 
 echo "Mirroring xray..."
 mirror_image "teddysun/xray:latest"
