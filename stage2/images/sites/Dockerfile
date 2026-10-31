@@ -13,12 +13,6 @@ RUN xcaddy build \
 # Prepare Caddyfile build Environment
 FROM localhost:8080/box_starting/local_ubuntu AS config-build-env
 WORKDIR /app
-
-# Match the existing proxy configuration builder on Proart and Global.
-RUN apt-get update && \
-    apt-get install -y curl ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
-
 COPY . .
 
 # Outputs to /app/Dist/Caddyfile

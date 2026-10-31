@@ -15,8 +15,6 @@
 		level info
 	}
 	servers :80 {
-		import cloudflare_trust
-
 		listener_wrappers {
 			proxy_protocol {
 				timeout 2s
@@ -25,8 +23,6 @@
 		}
 	}
 	servers :443 {
-		import cloudflare_trust
-
 		listener_wrappers {
 			proxy_protocol {
 				timeout 2s
