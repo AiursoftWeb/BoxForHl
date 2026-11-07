@@ -295,6 +295,7 @@ images=(
     "nextcloud:32.0.15-apache"
     "nextcloud:33.0.10-apache"
     # StatHub
+    "aiursoft/shepherd-140fixed"
     "aiursoft/stathub"
     # Tracer
     "aiursoft/tracer"
