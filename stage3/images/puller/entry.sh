@@ -283,7 +283,6 @@ images=(
     "grafana/alloy:v1.19.2"
     "grafana/grafana"
     "grafana/loki:3.7.2"
-    "prom/prometheus"
     # Kanban
     "aiursoft/kanban"
     "aiursoft/http_error_alert_center_bridge"
