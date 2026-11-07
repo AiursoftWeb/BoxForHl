@@ -5,7 +5,7 @@ set -euo pipefail
 
 get_db_conn() {
     local db_container
-    db_container=$(sudo docker ps --filter "name=authentik_postgresql" -q | head -1)
+    db_container=$(sudo docker ps --filter "name=authentik_postgresql" -q | sed -n '1p')
     if [ -z "$db_container" ]; then
         echo "[SKIP] authentik_postgresql not running, skipping Authentik fixes."
         exit 0
@@ -28,7 +28,7 @@ fix_ollama_models() {
     echo "--- Ollama Models ---"
 
     local ollama_cid
-    ollama_cid=$(sudo docker ps --filter "name=ollama-server" -q 2>/dev/null | head -1)
+    ollama_cid=$(sudo docker ps --filter "name=ollama-server" -q 2>/dev/null | sed -n '1p')
     if [ -z "$ollama_cid" ]; then
         echo "[SKIP] Ollama server not running."
         return 0
@@ -37,7 +37,7 @@ fix_ollama_models() {
     local models=("qwen3.6:35b" "bge-m3:latest")
 
     for model in "${models[@]}"; do
-        if sudo docker exec "$ollama_cid" ollama list 2>/dev/null | grep -q "$model"; then
+        if sudo docker exec "$ollama_cid" ollama list 2>/dev/null | grep "$model" >/dev/null; then
             echo "[OK]   Ollama model $model already present."
             continue
         fi
@@ -168,7 +168,7 @@ fix_app_permissions() {
         local service_name="${entry%%:*}"
         local app_name="${entry##*:}"
         local db_cid
-        db_cid=$(sudo docker ps --filter "name=${service_name}" -q 2>/dev/null | head -1)
+        db_cid=$(sudo docker ps --filter "name=${service_name}" -q 2>/dev/null | sed -n '1p')
 
         if [ -z "$db_cid" ]; then
             echo "[SKIP] ${app_name}: db container not running."
@@ -176,9 +176,9 @@ fix_app_permissions() {
         fi
 
         local db_user db_pass db_name
-        db_user=$(sudo docker inspect "$db_cid" --format '{{range .Config.Env}}{{println .}}{{end}}' 2>/dev/null | grep '^MYSQL_USER=' | cut -d= -f2 | head -1)
-        db_pass=$(sudo docker inspect "$db_cid" --format '{{range .Config.Env}}{{println .}}{{end}}' 2>/dev/null | grep '^MYSQL_PASSWORD=' | cut -d= -f2 | head -1)
-        db_name=$(sudo docker inspect "$db_cid" --format '{{range .Config.Env}}{{println .}}{{end}}' 2>/dev/null | grep '^MYSQL_DATABASE=' | cut -d= -f2 | head -1)
+        db_user=$(sudo docker inspect "$db_cid" --format '{{range .Config.Env}}{{println .}}{{end}}' 2>/dev/null | grep '^MYSQL_USER=' | cut -d= -f2 | sed -n '1p')
+        db_pass=$(sudo docker inspect "$db_cid" --format '{{range .Config.Env}}{{println .}}{{end}}' 2>/dev/null | grep '^MYSQL_PASSWORD=' | cut -d= -f2 | sed -n '1p')
+        db_name=$(sudo docker inspect "$db_cid" --format '{{range .Config.Env}}{{println .}}{{end}}' 2>/dev/null | grep '^MYSQL_DATABASE=' | cut -d= -f2 | sed -n '1p')
 
         if [ -z "$db_user" ] || [ -z "$db_pass" ] || [ -z "$db_name" ]; then
             echo "[WARN] ${app_name}: could not extract DB credentials from container env."
