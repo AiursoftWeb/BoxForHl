@@ -2,6 +2,9 @@ version: "3.9"
 
 services:
   app:
+    # Placeholder site for the historical Tencent Cloud filing-access arrangement.
+    # This is not a production content service; its local data is disposable.
+    # A persistent application data volume is intentionally unnecessary.
     image: hub.hlwuxi.com/aiursoft/marktohtml:latest
     networks:
       - proxy_app
