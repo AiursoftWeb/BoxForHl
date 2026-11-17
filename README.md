@@ -1,13 +1,42 @@
-# BoxForHlart ⚙️
+<a name="boxforhlart-️"></a>
+
+# Aiursoft BoxForHl
+
+## Overview
+
+### What is BoxForHl?
 
 **Role:** Customer-owned Hlart node, with code and operations maintained by Aiursoft
 
 This repository contains the configuration and deployment logic for the **Hlart Server**. The customer owns the server; Aiursoft currently maintains its code and operations. It is an independent customer deployment, not an Aiursoft-owned node.
 
-## 🎯 Strategic Objective
+<a name="-strategic-objective"></a>
+
+**Strategic objective.**
+
 To provide a self-contained, high-performance environment for hosting services on the Hlart server, with customer-local FRP, Authentik, and application services.
 
-## 🏗 Architecture Specifics
+## Installation
+
+Use a dedicated Linux host with systemd, Git, Bash and sudo access for this Box. The deployment entry point changes host configuration, installs or configures Docker, and deploys Docker Swarm services. Prepare the intended host, its storage and network access before running it.
+
+Fetch the configuration repository:
+
+```bash
+git clone https://gitlab.aiursoft.com/aiursoft/boxforhl.git
+cd boxforhl
+```
+
+Configure the private environment described in Configuration before deployment. This repository configures its named target; it is not a general-purpose installer for an unrelated workstation.
+
+The target is customer-owned. Deployment requires authorization for this customer environment and its own domains, registry and identity provider.
+
+## Usage
+
+<a name="-architecture-specifics"></a>
+
+### Architecture
+
 *   **Infrastructure:** Built on top of the Aiursoft Box project architecture.
 *   **Network:** Uses FRP for tunneling and Caddy for domain management.
 *   **Authentication:** Uses the customer's Authentik at `auth.hlwuxi.com`.
@@ -15,17 +44,29 @@ To provide a self-contained, high-performance environment for hosting services o
 *   **Images:** Business services use `hub.hlwuxi.com`. The local Puller reads public registries through Xray; it does not use `hub.aiursoft.cn`.
 *   **Domains:** All services are hosted under the `hlwuxi.com` domain.
 
-## 📦 Stacks Included
+<a name="-stacks-included"></a>
+
+### Stacks included
+
 *   **Stage 0:** Local Registry for bootstrapping.
 *   **Stage 1:** Image Mirroring for essential services.
 *   **Stage 2:** Network infrastructure (Caddy, FRP, PySyncer).
 *   **Stage 3:** Advanced registries and Identity management (Zot, Puller, Authentik).
 *   **Stage 4:** Business applications (EmployeeCenter, Kanban, StatHub, Tracer, etc.).
 
-## 🚀 Deployment
-Run `./deploy.sh` to start the deployment process. Ensure your `.env` file is properly configured.
+The list above describes the Box's service roles. The tracked `stage*/stacks` directories are the source of truth for the current deployable stack inventory.
 
-## FRP transport deployment
+### Deployment operations
+
+Select a starting stage and, when needed, a stage-4 stack name filter:
+
+```bash
+sudo bash deploy.sh --stage 4 --filter shepherd
+```
+
+`--stage` starts at the selected stage and continues through the later stages; it is not an instruction to run only that stage. `--filter` matches stage-4 stack names by substring. Earlier stages are not filtered, so combine it with `--stage 4` for a targeted application deployment.
+
+### FRP transport deployment
 
 The Box HTTP/HTTPS client uses KCP on UDP port 7000 for throughput validation.
 Verify that the gateway's existing `kcpBindPort = 7000` listener is available;
@@ -43,13 +84,15 @@ reviewed PR and the normal deployment process, restoring
 
 ---
 
-## 📐 Authoring Paradigms
+<a name="-authoring-paradigms"></a>
+
+### Authoring paradigms
 
 This project enforces a strict set of conventions for all `docker-compose.yml` and Caddy `.conf` files. Every new service **must** follow these paradigms exactly.
 
 ---
 
-### 1. Compose File Version
+#### 1. Compose File Version
 
 Always use version `3.9`.
 
@@ -59,7 +102,7 @@ version: '3.9'
 
 ---
 
-### 2. Service Field Order
+#### 2. Service Field Order
 
 Fields inside each service block must appear in this canonical order (omit fields that are not needed):
 
@@ -80,7 +123,7 @@ services:
 
 ---
 
-### 3. Image Naming
+#### 3. Image Naming
 
 All images **must** be pulled from the local registry mirror, never directly from Docker Hub.
 
@@ -97,7 +140,7 @@ Exception: bootstrap-phase images (before the hub is available) use `localhost:8
 
 ---
 
-### 4. Volume Pattern
+#### 4. Volume Pattern
 
 Every named volume **must** be a bind-mount backed by a path under `/swarm-vol/`. Anonymous volumes and plain named Docker volumes are forbidden.
 
@@ -122,7 +165,7 @@ Direct host paths (e.g. `/var/run/docker.sock`, `/etc/localtime`) are allowed in
 
 ---
 
-### 5. Network Pattern
+#### 5. Network Pattern
 
 There are four well-known external networks. Assign networks according to this table:
 
@@ -153,9 +196,9 @@ networks:
 
 ---
 
-### 6. How to Expose a Service
+#### 6. How to Expose a Service
 
-#### 6a. Exposing a Web Service (the easy path)
+##### 6a. Exposing a Web Service (the easy path)
 
 For any HTTP-based service, **do not publish ports 80 or 443**. Caddy is already listening on those ports on the host and handles all TLS termination. The only thing needed is:
 
@@ -164,7 +207,7 @@ For any HTTP-based service, **do not publish ports 80 or 443**. Caddy is already
 
 Caddy will pick up the new `.conf` file on next deploy and start routing traffic. No port mapping, no firewall changes.
 
-#### 6b. Exposing a Non-HTTP Port (the painful path)
+##### 6b. Exposing a Non-HTTP Port (the painful path)
 
 Exposing a raw TCP/UDP port (e.g. SSH, PostgreSQL) requires **two things** to work together:
 
@@ -186,7 +229,7 @@ Always use the long-form port syntax with `mode: host`.
 
 ---
 
-### 7. Secret / Credential Syntax
+#### 7. Secret / Credential Syntax
 
 Two distinct placeholder styles are used — **never mix them up**:
 
@@ -206,7 +249,7 @@ Two distinct placeholder styles are used — **never mix them up**:
 
 ---
 
-### 8. `stop_grace_period`
+#### 8. `stop_grace_period`
 
 | Service type | Value |
 | --- | --- |
@@ -215,7 +258,7 @@ Two distinct placeholder styles are used — **never mix them up**:
 
 ---
 
-### 9. Healthcheck Pattern
+#### 9. Healthcheck Pattern
 
 Healthchecks are required for all database services and any service that other services `depends_on`.
 
@@ -254,7 +297,7 @@ healthcheck:
 
 ---
 
-### 10. `deploy` Block
+#### 10. `deploy` Block
 
 Every service **must** have a `deploy` block. The structure is:
 
@@ -282,7 +325,7 @@ deploy:
 
 ---
 
-### 11. MySQL Database Service Pattern
+#### 11. MySQL Database Service Pattern
 
 ```yaml
 db:
@@ -319,7 +362,7 @@ Always use `MYSQL_RANDOM_ROOT_PASSWORD=true`. Never hardcode the root password.
 
 ---
 
-### 12. Aiursoft ASP.NET Core App Pattern
+#### 12. Aiursoft ASP.NET Core App Pattern
 
 Aiursoft apps (StatHub, Tracer, EmployeeCenter, OllamaGateway, …) share a common env-var shape:
 
@@ -349,7 +392,7 @@ The app service connects to `proxy_app`, `internal`, and `clickhouse_net`.
 
 ---
 
-### 13. Authentik Proxy Sidecar Pattern
+#### 13. Authentik Proxy Sidecar Pattern
 
 For services that do **not** have native OIDC support, add an `authentik_proxy` sidecar and protect the route in Caddy.
 
@@ -404,7 +447,7 @@ domain.hlwuxi.com {
 
 ---
 
-### 14. Caddy Reverse Proxy Config Pattern
+#### 14. Caddy Reverse Proxy Config Pattern
 
 Every service exposed to the internet gets a `<stack>.conf` file placed in `stage4/stacks/<stack>/`. The file is included by the Caddy container.
 
@@ -423,13 +466,13 @@ Naming rule: the upstream hostname inside Caddy follows Docker Swarm's DNS conve
 
 ---
 
-### 15. Shepherd Auto-Update Label
+#### 15. Shepherd Auto-Update Label
 
 Add `shepherd.autoupdate: "true"` to the `deploy.labels` of every service whose image comes from `hub.hlwuxi.com`. Do **not** add it for locally-built images (`localhost:8080/box_starting/...`) because shepherd cannot pull those.
 
 ---
 
-### 16. Project Directory Structure & Stage System
+#### 16. Project Directory Structure & Stage System
 
 The repository is organized into five sequential stages. Each stage is deployed in order by `deploy.sh` and builds upon the previous one.
 
@@ -459,7 +502,7 @@ The repository is organized into five sequential stages. Each stage is deployed 
 
 ---
 
-### 17. Stack File Organization
+#### 17. Stack File Organization
 
 Each stack lives in its own directory and follows this convention:
 
@@ -478,7 +521,7 @@ Rules:
 
 ---
 
-### 18. Container DNS Resolution
+#### 18. Container DNS Resolution
 
 Docker Swarm assigns DNS names using the pattern `<stack>_<service>`. This is how containers address each other within the swarm network. This naming convention is critical in Caddy configs and inter-service communication.
 
@@ -502,7 +545,7 @@ reverse_proxy http://stathub_app:80
 
 ---
 
-### 19. PostgreSQL Database Service Pattern
+#### 19. PostgreSQL Database Service Pattern
 
 ```yaml
 postgresql:
@@ -538,7 +581,7 @@ Note: The `$$` double-dollar escape is required in `docker-compose.yml` to preve
 
 ---
 
-### 20. Redis Cache Service Pattern
+#### 20. Redis Cache Service Pattern
 
 ```yaml
 redis:
@@ -569,7 +612,7 @@ Redis is used primarily by Authentik for session and cache storage. It is attach
 
 ---
 
-### 21. GPU Configuration Pattern
+#### 21. GPU Configuration Pattern
 
 Services requiring NVIDIA GPUs (Ollama, OCR) must declare GPU resources via `generic_resources` in the `deploy.resources.reservations` block. The host must have `nvidia-container-runtime` configured.
 
@@ -603,7 +646,7 @@ environment:
 
 ---
 
-### 22. Restart Policy Pattern
+#### 22. Restart Policy Pattern
 
 Use `deploy.restart_policy` for services that need automatic recovery. Choose the condition based on service criticality:
 
@@ -631,7 +674,7 @@ deploy:
 
 ---
 
-### 23. tmpfs Configuration
+#### 23. tmpfs Configuration
 
 Memory-intensive services (AI/OCR) and CI runners use `tmpfs` to mount RAM-backed temporary filesystems, avoiding disk I/O for ephemeral data.
 
@@ -650,7 +693,7 @@ Use `tmpfs` in the volumes list for `/dev/shm` mounts. Use the dedicated `tmpfs:
 
 ---
 
-### 24. deploy Block Field Order
+#### 24. deploy Block Field Order
 
 Fields inside the `deploy` block must appear in this canonical order:
 
@@ -676,7 +719,7 @@ deploy:
 
 ---
 
-### 25. Environment File Convention
+#### 25. Environment File Convention
 
 The project supports two environment files:
 
@@ -707,7 +750,7 @@ STATHUB_CLIENT_ID=YOUR_STATHUB_CLIENT_ID_HERE
 
 ---
 
-### 26. Shell Script Standards
+#### 26. Shell Script Standards
 
 All shell scripts in this repository (`deploy.sh`, `alldrop.sh`, `mirror.sh`, `generate_compose.sh`, `build_proxy.sh`, entrypoint scripts) follow these conventions:
 
@@ -745,7 +788,7 @@ export INFO="${Blue}[ INFO ]${Font}"
 
 ---
 
-### 27. Dockerfile Conventions
+#### 27. Dockerfile Conventions
 
 Custom Dockerfiles in `stage<N>/images/<name>/` follow these rules:
 
@@ -778,7 +821,7 @@ COPY --from=config-build-env /app/Dist/Caddyfile /etc/caddy/Caddyfile
 
 ---
 
-### 28. CI/CD Pipeline
+#### 28. CI/CD Pipeline
 
 The `.gitlab-ci.yml` defines a single lint stage that validates all compose files against the conventions documented here:
 
@@ -815,7 +858,7 @@ The linter checks:
 
 ---
 
-### 29. Adding a New Service — Checklist
+#### 29. Adding a New Service — Checklist
 
 When adding a new business service, follow this checklist in order:
 
@@ -841,18 +884,18 @@ When adding a new business service, follow this checklist in order:
 
 ---
 
-## Historical Domain Notes
+### Historical domain notes
 
 The lists below are historical planning notes, not a live service inventory. Use the tracked stacks and runtime checks for current state.
 
-### TODO
+#### TODO
 
 marktohtml.hlwuxi.com
 vault.hlwuxi.com
 minio.hlwuxi.com
 litellm.hlwuxi.com
 
-### Done
+#### Done
 
 nextcloud.hlwuxi.com
 uptime.hlwuxi.com
@@ -870,3 +913,59 @@ openweb.hlwuxi.com
 ocr.hlwuxi.com
 gitlab.hlwuxi.com
 tty.hlwuxi.com
+
+**Check the result.** On the target Swarm manager, inspect the selected stack and its tasks:
+
+```bash
+sudo docker stack ls
+sudo docker stack services shepherd
+sudo docker stack ps shepherd --no-trunc
+```
+
+Replace `shepherd` with the stack being inspected. Confirm the desired replicas, task errors and the service's own health endpoint or application behavior. A successful `docker stack deploy` submission does not prove every service is healthy. For a failed change, inspect task errors and restore a reviewed configuration through the same deployment entry point; preserve existing bind-mounted data.
+
+## Configuration
+
+`deploy.sh` reads `.env.prod` first and falls back to `.env`; it does not merge the two files. Keep real credentials in the private deployment environment. Values replace matching `{{VARIABLE_NAME}}` placeholders in temporary Compose copies; tracked Compose sources remain unchanged.
+
+Prepare the private file from the tracked [.env](.env) reference and fill in the values required by the selected services:
+
+```bash
+cp .env .env.prod
+$EDITOR .env.prod
+```
+
+`REGISTRY_HOST` and `REGISTRY_VERIFICATION_IMAGE` select the registry and the image used to verify access. `DOCKERHUB_USERNAME` and `DOCKERHUB_PASSWORD` are the deployment registry credentials. `PUBLIC_DOCKER_HUB_USERNAME` and `PUBLIC_DOCKER_HUB_PASSWORD` provide the separate public Docker Hub bootstrap credentials. The tracked environment reference also lists each application's OIDC, API, mail and other external settings. An absent environment file does not supply defaults for required registry credentials.
+
+Service definitions and bind mounts live in `stage<N>/stacks/<stack-name>/docker-compose.yml`; custom image sources live in `stage<N>/images`. Review these files, the Caddy routes and any FRP configuration together before changing a service's exposure or storage. Keep existing database credentials and persistent data consistent during updates.
+
+The complete environment-file convention, application configuration examples and all 29 authoring rules remain inline in Usage under Authoring paradigms.
+
+## Development
+
+Validate the configuration using the repository's existing lint entry point:
+
+```bash
+bash -n deploy.sh
+python3 ./lint.py
+```
+
+The linter requires Python 3 and PyYAML. The existing GitLab merge-request pipeline runs the repository's configured lint checks. Syntax and configuration checks do not deploy services or verify a live host.
+
+<a name="-deployment"></a>
+
+Use the supported deployment entry point for the intended target:
+
+Run `./deploy.sh` to start the deployment process. Ensure the selected `.env.prod` or fallback `.env` file is properly configured.
+
+## How to contribute
+
+There are many ways to contribute to the project: logging bugs, submitting pull requests, reporting issues, and creating suggestions.
+
+Even if you have push rights on the repository, you should create a personal fork and create feature branches there when you need them. This keeps the main repository clean and your workflow cruft out of sight.
+
+We're also interested in your feedback on the future of this project. You can submit a suggestion or feature request through the issue tracker. To make this process more effective, we're asking that these include more information to help define them more clearly.
+
+## License
+
+Licensed under the [GNU General Public License v3.0](LICENSE).
