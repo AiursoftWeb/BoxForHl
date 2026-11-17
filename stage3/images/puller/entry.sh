@@ -285,7 +285,7 @@ images=(
     "grafana/loki:3.7.2"
     # Kanban
     "aiursoft/kanban"
-    "aiursoft/http_error_alert_center_bridge"
+    "aiursoft/logwatchdog"
     # MarkToHTML
     "aiursoft/marktohtml"
     # MoongladeV2
