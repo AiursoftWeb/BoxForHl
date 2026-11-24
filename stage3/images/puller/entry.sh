@@ -270,7 +270,7 @@ images=(
     "ghcr.io/open-webui/open-webui:main"
     "nvidia/cuda:12.8.1-devel-ubuntu24.04"
     # ClickHouse application error monitor
-    "aiursoft/clickhouse_app_log_error_monitor"
+    "aiursoft/dotnetwatchdog"
     # ClickHouse
     "clickhouse/clickhouse-server"
     # Employee Center

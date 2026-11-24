@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   app:
-    image: hub.hlwuxi.com/aiursoft/clickhouse_app_log_error_monitor:latest
+    image: hub.hlwuxi.com/aiursoft/dotnetwatchdog:latest
     environment:
       - NODE_NAME=hl
       - CLICKHOUSE_PUBLIC_URL=https://clickhouse.hlwuxi.com
